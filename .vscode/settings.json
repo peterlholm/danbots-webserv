@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "e:\\Arbejde\\DanBots\\DanWand\\danbots-webserv\\env\\Scripts\\python.exe",
+    "terminal.integrated.env.windows": {
+    "FLASK_APP": "webservice",
+    "FLASK_ENV":"development"
+    },
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+}

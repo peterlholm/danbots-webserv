@@ -1,0 +1,21 @@
+#
+# danvwand init service
+#
+
+[Unit]
+Description=DanWand Web service
+After=network.target
+StartLimitIntervalSec=10
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=pi
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/webservice.log
+ExecStart=/usr/bin/python3 /home/pi/danbots-webserv/run.sh 
+WorkingDirectory=/home/danwand/init
+
+[Install]
+WantedBy=multi-user.target

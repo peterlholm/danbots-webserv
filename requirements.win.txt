@@ -1,0 +1,14 @@
+flask
+
+# debug
+pylint
+
+# win
+pygame
+videocapture
+
+#requests
+
+#gpiozero
+#picamera
+

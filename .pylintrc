@@ -1,0 +1,21 @@
+[MASTER]
+//load-plugins=pylint_django
+
+django-settings-module=live.settings
+
+init-hook='import sys; sys.path.insert(0, "${workspaceFolder}"); print(sys.path);'
+
+[MESSAGES CONTROL]
+
+disable=missing-function-docstring,
+        missing-module-docstring,
+        line-too-long
+
+[BASIC]
+
+good-names=i,
+           j,
+           k,
+           fd,
+           ex,
+           Run,
