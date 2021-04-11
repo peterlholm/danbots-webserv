@@ -1,37 +1,11 @@
-from sys import platform
 from time import sleep
 from datetime import datetime
 from io import BytesIO
-from flask import Blueprint, send_file, Response, request
-
+from flask import Blueprint, Response, request
+from camera import init_camera, warm_up, get_camera_settings
 from send_files import send_mem_files_bg
 
 # python: disable=unresolved-import,import-error
-
-#from mpeg import scan_cont_pictures
-
-if platform == "linux":
-    from picamera import PiCamera   # pylint: disable=import-error
-else:
-    import pygame
-    import pygame.camera # pylint: disable=wrong-import-position
-    #from pygame.locals import *
-
-def init_camera():
-    if platform=="linux":
-        camera = PiCamera()
-        #camera.framerate_range =(20,40)
-        #camera.resolution =(150,150)
-        return camera
-    else:
-        pygame.camera.init()
-        mycam = pygame.camera.Camera(0,(640,480))
-        mycam.start()
-        return mycam
-
-def warm_up():
-    sleep(1)
-
 
 def send_picture(fd1, i):
     send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
@@ -60,26 +34,21 @@ def get_pictures(camera):
     finally:
         stop = datetime.now()
         print("Vi lukker og slukker {:2.1f} Billeder/sek".format(i/((stop-start).total_seconds())))
+        print(get_camera_settings(camera))
         camera.close()
-
-
-# app = Flask(__name__)
-
-# print ("--- Server Ready ---")
 
 pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 
-
-# def cam():
-#     camera = init_camera()
-#     camera.warm_up()
-#     return Response(get_pictures(camera),
-#                     mimetype='multipart/x-mixed-replace; boundary=frame')
-@pic3d.route('/2d')
+@pic2d.route('/2d')
 def cam():
     camera = init_camera()
+    warm_up(camera)
+    #camera.resolution =(640,480)
+    camera.resolution =(150,150)
+    camera.framerate_range =(10,25)
+
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
-    warm_up()
+    warm_up(camera)
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')

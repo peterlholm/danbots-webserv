@@ -13,17 +13,16 @@ else:
 def init_camera():
     if platform=="linux":
         camera = PiCamera()
-        camera.framerate_range =(10,10)
+        camera.framerate_range =(10,30)
         # camera.resolution =(1280,720)
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
         camera.resolution =(150,150)
-        return camera
     else:
         pygame.camera.init()
-        mycam = pygame.camera.Camera(0,(640,480))
-        mycam.start()
-        return mycam
+        camera = pygame.camera.Camera(0,(640,480))
+        camera.start()
+    return camera
 
 def warm_up(camera):
     sleep(1)
