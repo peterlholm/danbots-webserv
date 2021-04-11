@@ -1,6 +1,13 @@
 import datetime
 from io import BytesIO
 
+def print_settings(camera):
+    strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)<br>".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
+    strg += "FrameRate: " + str(camera.framerate) + "<br>"
+    strg += "FrameRateRange: " + str(camera.framerate_range) + "<br>"
+    strg += "PictureSize: " + str(camera.resolution) + "<br>"
+    return strg
+
 def mpeg_pictures(camera):
     fd1 = BytesIO()
     i=1

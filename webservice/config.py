@@ -13,7 +13,7 @@ WINDOWS=False
 CONFIGFILE="/etc/danwand.conf"
 
 if os.name=='nt':
-    CONFIGFILE="../danwand.conf"
+    CONFIGFILE=r"..\..\danwand.conf"
     WINDOWS=True
 else:
     pass

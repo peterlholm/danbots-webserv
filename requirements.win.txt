@@ -1,4 +1,6 @@
+requests
 flask
+#picamera
 
 # debug
 pylint
@@ -6,9 +8,3 @@ pylint
 # win
 pygame
 videocapture
-
-#requests
-
-#gpiozero
-#picamera
-
