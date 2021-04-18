@@ -5,7 +5,7 @@ import threading
 import datetime
 from io import BytesIO, open
 import requests
-from config import  APISERVER # DEBUG,
+from wand_config import  APISERVER # DEBUG,
 
 APIURL = APISERVER + "sendpic"
 APIURL = APISERVER + "savefile"

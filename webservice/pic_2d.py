@@ -43,8 +43,8 @@ pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 def cam():
     camera = init_camera()
     warm_up(camera)
-    #camera.resolution =(640,480)
-    camera.resolution =(150,150)
+    camera.resolution =(640,480)
+    #camera.resolution =(150,150)
     camera.framerate_range =(10,25)
 
     size = request.args.get('size', None)

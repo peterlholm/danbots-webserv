@@ -57,8 +57,8 @@ def u_picture():
 @pic.route('/cam')
 def cam():
     camera = init_camera()
-    #camera.resolution =(640,480)
-    camera.resolution =(150,150)
+    camera.resolution =(640,480)
+    #camera.resolution =(150,150)
     camera.framerate_range =(10,25)
     warm_up(camera)
     print(get_camera_settings(camera))

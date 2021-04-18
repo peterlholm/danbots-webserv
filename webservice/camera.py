@@ -26,8 +26,8 @@ def init_camera():
 
 def warm_up(camera):
     sleep(1)
-    print ("Camera initial settings")
-    print(get_camera_settings(camera))
+    # print ("Camera initial settings")
+    # print(get_camera_settings(camera))
 
 def get_camera_settings(camera):
     strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
