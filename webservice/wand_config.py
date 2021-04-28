@@ -33,6 +33,7 @@ DEVICEID = myconfig.get('device','deviceid',fallback='11223344')
 #     DEBUG=config['debug'].get('debug', DEBUG)
 #print ('Sections: ', config.sections())
 APISERVER=myconfig['server']['apiserver']
+COMPUTE_SERVER=myconfig['server']['computeserver']
 #print(APISERVER)
 # scanpicture = config[SCAN_PICTURE]
 # no_picture = scanpicture.get(NUMBER_PIC, NO_PICTURE)

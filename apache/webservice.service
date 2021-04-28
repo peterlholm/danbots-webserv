@@ -1,0 +1,21 @@
+#
+# danwand Web service
+#
+
+[Unit]
+Description=DanWand Web service
+After=network.target
+StartLimitIntervalSec=10
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=danwand
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/var/log/webservice.log
+ExecStart=/usr/bin/python3 /var/www/webservice/webservice/webservice.py 
+WorkingDirectory=/var/www/webservice/webservice
+
+[Install]
+WantedBy=multi-user.target

@@ -5,11 +5,11 @@ import threading
 import datetime
 from io import BytesIO, open
 import requests
-from wand_config import  APISERVER # DEBUG,
+from wand_config import  APISERVER,COMPUTE_SERVER # DEBUG,
 
 APIURL = APISERVER + "sendpic"
-APIURL = APISERVER + "savefile"
-HTTP_TIMEOUT=25
+APIURL = COMPUTE_SERVER + "send3dscan"
+HTTP_TIMEOUT=5
 _DEBUG=False
 
 #print (APIURL)
@@ -31,7 +31,7 @@ def send_files (files: str or [str], info=None, params=None):
     if isinstance(files, list):
         files_spec=[]
         for myfile in files:
-            files_spec.append(('Picture', (myfile, open(myfile,'rb'))))
+            files_spec.append((namelist.pop(0), (myfile, open(myfile,'rb'))))
     else:
         files_spec=[('Picture', (files, open(files,'rb')))]
 
@@ -76,7 +76,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
     files_spec=None
     data_spec={}
     #info_spec=None
-
+    namelist =['color_picture','blackWhite_picture','noLight_picture']
     if isinstance(files,list):
         files_spec=[]
         i = 1
@@ -84,7 +84,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
             fil.seek(0)
             filename = file_name + str(i) + '.' + file_type
             #print(filename)
-            files_spec.append(('Picture', (filename, fil)))
+            files_spec.append((namelist.pop(0), (filename, fil)))
             i = i+1
     else:
         filename = file_name + "." + file_type

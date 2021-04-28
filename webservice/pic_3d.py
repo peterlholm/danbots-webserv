@@ -24,25 +24,25 @@ def set_dias(on_off):
 # python: disable=unresolved-import,import-error
 
 def send_picture(fd1, i):
-    send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
+    send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info="djdjdjdj" )
 
 def get_picture_set(camera):
-    print("Lysbilled on")
+    #print("Lysbilled on")
     set_flash(False)
     set_dias(True)
     fd2 = BytesIO()
-    sleep(1)
+    #sleep(1)
     camera.capture(fd2, format='jpeg', use_video_port=True)
     fd2.truncate()
     fd2.seek(0)
     set_dias(False)
-    print("led off")
-    sleep(1)
+    #print("led off")
+    #sleep(1)
     fd3 = BytesIO()
     camera.capture(fd3, format='jpeg', use_video_port=True)
     fd3.truncate()
     fd3.seek(0)
-    print ("Normal light")
+    #print ("Normal light")
     set_flash(True)
     return (fd2, fd3)
 
@@ -66,7 +66,7 @@ def get_pictures(camera):
                 send_picture([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
-                break
+                #break
             i=i+1
             sleep(0)
 
@@ -83,7 +83,7 @@ def cam():
     camera = init_camera()
     #camera.resolution =(640,480)
     camera.resolution =(150,150)
-    camera.framerate_range =(10,25)
+    camera.framerate_range =(10,10)
 
     size = request.args.get('size', None)
     if size:
