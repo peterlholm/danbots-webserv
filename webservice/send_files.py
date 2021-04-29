@@ -5,10 +5,10 @@ import threading
 import datetime
 from io import BytesIO, open
 import requests
-from wand_config import  APISERVER,COMPUTE_SERVER # DEBUG,
+from wand_config import  APISERVER,COMPUTE_SERVER, DEVICEID # DEBUG,
 
 APIURL = APISERVER + "sendpic"
-APIURL = COMPUTE_SERVER + "send3dscan"
+APIURL = COMPUTE_SERVER + "scan3d"
 HTTP_TIMEOUT=5
 _DEBUG=False
 
@@ -39,7 +39,7 @@ def send_files (files: str or [str], info=None, params=None):
         data_spec = params
 
     if info is not None:
-        data_spec = { **data_spec, "info": info}
+        data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
     if _DEBUG:
         print('Data', data_spec)
         print ("filespec", files_spec)
@@ -95,7 +95,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
         data_spec = params
 
     if info is not None:
-        data_spec = { **data_spec, "info": info}
+        data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
     if _DEBUG:
         print('Data', data_spec)
         print ("filespec", files_spec)
