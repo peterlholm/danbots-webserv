@@ -76,7 +76,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
     files_spec=None
     data_spec={}
     #info_spec=None
-    namelist =['color_picture','blackWhite_picture','noLight_picture']
+    namelist =['color_picture','french_picture','noLight_picture']
     if isinstance(files,list):
         files_spec=[]
         i = 1

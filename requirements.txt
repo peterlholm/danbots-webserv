@@ -1,8 +1,9 @@
 requests
 flask
 picamera
+gpiozero
 
 #pylint
-#gpiozero
+
 
 
