@@ -1,9 +1,7 @@
 [MASTER]
 //load-plugins=pylint_django
 
-django-settings-module=live.settings
-
-init-hook='import sys; sys.path.insert(0, "${workspaceFolder}"); print(sys.path);'
+//django-settings-module=live.settings
 
 [MESSAGES CONTROL]
 

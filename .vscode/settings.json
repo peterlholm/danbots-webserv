@@ -4,6 +4,11 @@
     "FLASK_APP": "webservice",
     "FLASK_ENV":"development"
     },
+    "python.autoComplete.extraPaths": ["./webservice"],
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.linting.pylintArgs": [
+        "--init-hook",
+        "import sys; sys.path.append(\"E:\\\\Arbejde\\\\DanBots\\\\DanWand\\\\danbots-webserv\\\\webservice\");"
+    ]
 }

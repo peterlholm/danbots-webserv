@@ -5,14 +5,36 @@ import threading
 import datetime
 from io import BytesIO, open
 import requests
-from wand_config import  APISERVER,COMPUTE_SERVER, DEVICEID # DEBUG,
+from wand_config import COMPUTE_SERVER, DEVICEID #APISERVER,
 
-APIURL = APISERVER + "sendpic"
-APIURL = COMPUTE_SERVER + "scan3d"
+#APIURL = APISERVER + "sendpic"
+#APIURL = COMPUTE_SERVER + "scan3d"
+API_SENDPIC = 'sendpic'
+API_SCAN3D = 'scan3d'
+API_START = 'start3d'
+API_STOP = 'stop3d'
 HTTP_TIMEOUT=5
 _DEBUG=False
 
-#print (APIURL)
+def send_start():
+    apiurl = COMPUTE_SERVER + API_START
+    data_spec = {"deviceid": DEVICEID }
+    req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
+        print('Noget gik galt: ', req.status_code)
+        print(req.text)
+        return False
+    return True
+
+def send_stop():
+    apiurl = COMPUTE_SERVER + API_STOP
+    data_spec = {"deviceid": DEVICEID }
+    req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
+        print('Noget gik galt: ', req.status_code)
+        print(req.text)
+        return False
+    return True
 
 def send_files (files: str or [str], info=None, params=None):
     """ Send a bunch of file to the server
@@ -22,7 +44,7 @@ def send_files (files: str or [str], info=None, params=None):
     :return: Result of operations
     :rtype: Boolean
     """
-
+    apiurl = COMPUTE_SERVER + API_SENDPIC
     if _DEBUG:
         print("SendFiles:", files, info, params)
     files_spec=None
@@ -31,7 +53,7 @@ def send_files (files: str or [str], info=None, params=None):
     if isinstance(files, list):
         files_spec=[]
         for myfile in files:
-            files_spec.append((namelist.pop(0), (myfile, open(myfile,'rb'))))
+            files_spec.append(('Pictures', (myfile, open(myfile,'rb'))))
     else:
         files_spec=[('Picture', (files, open(files,'rb')))]
 
@@ -44,7 +66,7 @@ def send_files (files: str or [str], info=None, params=None):
         print('Data', data_spec)
         print ("filespec", files_spec)
     try:
-        req = requests.post(APIURL, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
     except requests.exceptions.RequestException as ex:
         print(ex)
         return False
@@ -54,9 +76,9 @@ def send_files (files: str or [str], info=None, params=None):
             print('det gik godt')
             print(req.text)
         return True
-    else:
-        print('Noget gik galt: ', req.status_code)
-        print(req.text)
+
+    print('Noget gik galt: ', req.status_code)
+    print(req.text)
     return False
 
 def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=None):
@@ -70,7 +92,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
     :return: Result of operations
     :rtype: Boolean
     """
-
+    apiurl = COMPUTE_SERVER + API_SCAN3D
     if _DEBUG:
         print("SendFiles:", files, info, params)
     files_spec=None
@@ -100,7 +122,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
         print('Data', data_spec)
         print ("filespec", files_spec)
     try:
-        req = requests.post(APIURL, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
     except requests.exceptions.RequestException as ex:
         print(ex)
         return False
@@ -110,9 +132,8 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
             print('det gik godt')
             print(req.text)
         return True
-    else:
-        print('Noget gik galt: ', req.status_code)
-        print(req.text)
+    print('Noget gik galt: ', req.status_code)
+    print(req.text)
     return False
 
 def send_mem_files_bg (files, file_name="file", file_type="jpg", info=None, params=None):
@@ -131,7 +152,6 @@ def sendfile(name):
         fd2 = BytesIO(fd.read())
     send_mem_files_bg(fd2, "testfile")
     print("thread end", datetime.datetime.now())
-
 
 if __name__ == "__main__":
     print(datetime.datetime.now())

@@ -3,7 +3,7 @@ from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
 from camera import init_camera, warm_up, get_camera_settings
-from send_files import send_mem_files_bg
+from send_files import send_mem_files_bg, send_start
 from gpiozero import LED
 
 LED_dias = LED(12)
@@ -80,6 +80,7 @@ pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 
 @pic3d.route('/3d')
 def cam():
+    send_start()
     camera = init_camera()
     #camera.resolution =(640,480)
     camera.resolution =(150,150)
