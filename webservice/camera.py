@@ -17,7 +17,7 @@ def init_camera():
         # camera.resolution =(1280,720)
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
-        camera.resolution =(150,150)
+        camera.resolution =(160,160)
     else:
         pygame.camera.init()
         camera = pygame.camera.Camera(0,(640,480))

@@ -83,7 +83,7 @@ def cam():
     send_start()
     camera = init_camera()
     #camera.resolution =(640,480)
-    camera.resolution =(150,150)
+    camera.resolution =(160,160)
     camera.framerate_range =(10,10)
 
     size = request.args.get('size', None)
