@@ -3,7 +3,7 @@ from datetime import datetime
 from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request
-from camera import init_camera, warm_up, get_camera_settings
+from camera import init_camera, warm_up, get_camera_settings,get_picture_info
 if platform == "nt":
     from pygame.image import save_extended
 
@@ -52,6 +52,7 @@ def u_picture():
     camera = init_camera()
     camera.resolution =(2592,1944)
     warm_up(camera)
+    print(get_picture_info)
     return send_file(get_picture(camera), mimetype='image/jpeg' )
 
 @pic.route('/cam')
@@ -69,3 +70,12 @@ def cam():
     if max_frame:
         camera.framerate_range.high = Fraction(1, int(max_frame))
     return Response(scan_cont_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@pic.route('/info')
+def info():
+    camera = init_camera()
+    warm_up(camera)
+    camera_info = get_picture_info(camera)
+    print(str(camera_info))
+    camera.close()
+    return Response(str(camera_info).replace('\n', '<br />'))

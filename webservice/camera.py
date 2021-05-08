@@ -29,6 +29,39 @@ def warm_up(camera):
     # print ("Camera initial settings")
     # print(get_camera_settings(camera))
 
+def get_picture_info(camera):
+    info = { 'analog_gain': camera.analog_gain,
+     'digital_gain': camera.digital_gain,
+     'awb_gains': camera.awb_gains,
+        'awb_mode': camera.awb_mode,
+        'brightness': camera.brightness,
+        'color_effects': camera.color_effects,
+        'contrast': camera.contrast,
+        'crop': camera.crop,
+        'drc_strength': camera.drc_strength,
+        'exif_tags': camera.exif_tags,
+        'exposure_compensation': camera.exposure_compensation,
+        'exposure_mode': camera.exposure_mode,
+        'exposure_speed': camera.exposure_speed,
+        'flash_mode': camera.flash_mode,
+        'framerate': camera.framerate,
+        #'framerate_delta': camera.framerate_delta,
+        'framerate_range': camera.framerate_range,
+        'image_denoise': camera.image_denoise,
+        'image_effect': camera.image_effect,
+        'iso': camera.iso,
+        'meter_mode': camera.meter_mode,
+        'resolution': camera.resolution,
+        'revision': camera.revision,
+        'saturation': camera.saturation,
+        'sensor_mode': camera.sensor_mode,
+        'sharpness': camera.sharpness,
+        'shutter_speed': camera.shutter_speed,
+        'video_denoise': camera.video_denoise,
+        'zoom': camera.zoom
+    }
+    return info
+
 def get_camera_settings(camera):
     strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"

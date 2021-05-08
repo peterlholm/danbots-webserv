@@ -2,10 +2,15 @@ from time import sleep
 from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
-from camera import init_camera, warm_up, get_camera_settings
+from camera import init_camera, warm_up, get_camera_settings, get_picture_info
 from send_files import send_mem_files_bg
 
 # python: disable=unresolved-import,import-error
+
+def get_picture_info(camera):
+    info = get_picture_info(camera)
+    print(info)
+    return info
 
 def send_picture(fd1, i):
     send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
@@ -52,3 +57,5 @@ def cam():
         camera.resolution =(int(size),int(size))
     warm_up(camera)
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+   
