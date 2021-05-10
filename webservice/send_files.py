@@ -5,7 +5,7 @@ import threading
 import datetime
 from io import BytesIO, open
 import requests
-from wand_config import COMPUTE_SERVER, DEVICEID #APISERVER,
+from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
 #APIURL = APISERVER + "sendpic"
 #APIURL = COMPUTE_SERVER + "scan3d"
@@ -15,6 +15,25 @@ API_START = 'start3d'
 API_STOP = 'stop3d'
 HTTP_TIMEOUT=5
 _DEBUG=False
+
+def sendfile(name):
+    """ Send one file from disk """
+    print("thread start", datetime.datetime.now())
+    print(name)
+    files_spec = {'file': name }
+    data_spec =None
+    req = requests.post(API_SERVER + "savefile", timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+    print (req)
+    print("thread end", datetime.datetime.now())
+
+def sendmemfile(name):
+    """ Send one file from disk """
+    print("thread start", datetime.datetime.now())
+    print(name)
+    with open(name, 'rb') as fd:
+        fd2 = BytesIO(fd.read())
+    send_mem_files_bg(fd2, "testfile")
+    print("thread end", datetime.datetime.now())
 
 def send_start():
     apiurl = COMPUTE_SERVER + API_START
@@ -145,19 +164,7 @@ def send_mem_files_bg (files, file_name="file", file_type="jpg", info=None, para
     th1 = threading.Thread(target=send_mem_files, args=(files, file_name, file_type, info, params))
     th1.start()
 
-def sendfile(name):
-    print("thread start", datetime.datetime.now())
-    print(name)
-    with open('file1.jpg', 'rb') as fd:
-        fd2 = BytesIO(fd.read())
-    send_mem_files_bg(fd2, "testfile")
-    print("thread end", datetime.datetime.now())
 
 if __name__ == "__main__":
-    print(datetime.datetime.now())
-    with open('webservice.py', 'rb') as fh:
-        myfd = BytesIO(fh.read())
-    RESULT = send_mem_files(myfd, "testfile", file_type='py', info={'myinfo': 22}, params={'myparams':"parameter"})
-    print ("send file result", RESULT)
-    send_mem_files_bg(myfd, "testfile", file_type='py')
-    print ("send file in background")
+    sendfile("picture.py")
+    

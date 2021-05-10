@@ -1,5 +1,6 @@
 from sys import platform
 from time import sleep
+from webservice_config import MAXFRAMERATE, WARMUP_TIME
 
 # python: disable=unresolved-import,import-error
 
@@ -13,11 +14,11 @@ else:
 def init_camera():
     if platform=="linux":
         camera = PiCamera()
-        camera.framerate_range =(10,30)
+        camera.framerate_range =(10,MAXFRAMERATE)
         # camera.resolution =(1280,720)
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
-        camera.resolution =(160,160)
+        #camera.resolution =(160,160)
     else:
         pygame.camera.init()
         camera = pygame.camera.Camera(0,(640,480))
@@ -25,9 +26,7 @@ def init_camera():
     return camera
 
 def warm_up(camera):
-    sleep(1)
-    # print ("Camera initial settings")
-    # print(get_camera_settings(camera))
+    sleep(WARMUP_TIME)
 
 def get_picture_info(camera):
     info = { 'analog_gain': camera.analog_gain,
