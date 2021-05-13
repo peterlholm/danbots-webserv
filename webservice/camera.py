@@ -61,6 +61,12 @@ def get_picture_info(camera):
     }
     return info
 
+def get_exposure_info(picture_info):
+    strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec)\r\n".format(picture_info['exposure_speed']/1000000, 1000000/picture_info['exposure_speed'])
+    strg += "Gain: Analog: {} Digital: {} AutoWhiteBalance: r:{} b:{}\r\n".format(
+        picture_info['analog_gain'], picture_info['digital_gain'], picture_info['awb_gains'][0],picture_info['awb_gains'][1])
+    return strg
+    
 def get_camera_settings(camera):
     strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"

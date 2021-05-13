@@ -3,19 +3,19 @@ from datetime import datetime
 from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request
-from camera import init_camera, warm_up, get_camera_settings,get_picture_info
-from webservice_config import MAXFRAMERATE, WARMUP_TIME
+from camera import init_camera, warm_up, get_camera_settings, get_picture_info, get_exposure_info
+#from webservice_config import MAXFRAMERATE, WARMUP_TIME
 
 if platform == "nt":
     from pygame.image import save_extended
 
-def get_picture(camera):
+def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
     if platform == "linux":
         fd1 = BytesIO()
-        camera.capture(fd1, format='jpeg')
+        camera.capture(fd1, format=format, quality=quality)
         fd1.truncate()
         fd1.seek(0)
-        print(get_camera_settings(camera))
+        #print(get_camera_settings(camera))
         camera.close()
         return fd1
     # windows
@@ -54,8 +54,21 @@ def u_picture():
     camera = init_camera()
     camera.resolution =(2592,1944)
     warm_up(camera)
-    print(get_picture_info)
-    return send_file(get_picture(camera), mimetype='image/jpeg' )
+    pic_format='jpeg'
+    pic_mime='image/jpeg'
+
+    img_type = request.args.get('type', None)
+    if img_type=='png':
+        pic_format='png'
+        pic_mime='image/png'
+    pic_quality = 85
+    quality = request.args.get('quality', None)
+    if quality:
+        pic_quality=quality
+    #print(get_picture_info(camera))
+    #print()
+    print(get_exposure_info(get_picture_info(camera)))
+    return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
 @pic.route('/cam')
 def cam():
