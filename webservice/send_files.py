@@ -7,24 +7,43 @@ from io import BytesIO, open
 import requests
 from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
-#APIURL = APISERVER + "sendpic"
-#APIURL = COMPUTE_SERVER + "scan3d"
+# live
 API_SENDPIC = 'sendpic'
+API_SAVEFILE = 'savefile'
+# compute
 API_SCAN3D = 'scan3d'
 API_START = 'start3d'
 API_STOP = 'stop3d'
-HTTP_TIMEOUT=5
+
+HTTP_TIMEOUT=16
 _DEBUG=False
 
 def sendfile(name):
     """ Send one file from disk """
     print("thread start", datetime.datetime.now())
     print(name)
-    files_spec = {'file': name }
+    files_spec = {'file': (name, open(name,'rb') )}
     data_spec =None
-    req = requests.post(API_SERVER + "savefile", timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+    req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
     print (req)
     print("thread end", datetime.datetime.now())
+
+def send_file_object(file_object, file_name, data=None):
+    file_spec = {'file': (file_name, file_object) }
+    req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
+    if not req:
+        print(req)
+    return req
+
+def send_file_objects(name_object_list, data=None):
+    file_spec = []
+    for f in name_object_list:
+        file_spec.append(('files', f))
+    req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
+    if not req:
+        print(req)
+    return req
+
 
 def sendmemfile(name):
     """ Send one file from disk """
@@ -166,5 +185,8 @@ def send_mem_files_bg (files, file_name="file", file_type="jpg", info=None, para
 
 
 if __name__ == "__main__":
-    sendfile("picture.py")
+    fd = open('pic_3d.py','rb')
+    fd2 = open('pic_2d.py','rb')
+
+    send_file_objects([('fil3.py', fd),('fil2.py', fd2)], {"dummy":"hhh"})
     

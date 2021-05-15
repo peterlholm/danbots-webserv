@@ -40,9 +40,14 @@ COMPUTE_SERVER=myconfig['server']['computeserver']
 
 if not myconfig.has_section('camera'):
     myconfig.add_section('camera')
+    myconfig['camera']['minframerate'] = "5"
     myconfig['camera']['maxframerate'] = "10"
     myconfig['camera']['warmup_time'] = "0.5"
+    myconfig['camera']['width'] = "160"
+    myconfig['camera']['height'] = "160"
     save_config(myconfig)
-
+MINFRAMERATE = float(myconfig['camera'].get('minframerate'))
 MAXFRAMERATE = float(myconfig['camera'].get('maxframerate'))
-WARMUP_TIME = float(myconfig['camera'].get('warmup_time'))
+WARMUP_TIME = float(myconfig['camera'].get('warmup_time',1))
+HEIGHT = int(myconfig['camera'].get('height',160))
+WIDTH = int(myconfig['camera'].get('width',160))

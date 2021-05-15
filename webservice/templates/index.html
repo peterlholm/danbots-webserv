@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>DanWand Webservice</h1>
+<br>
+<ul>
+    <li><a href="/pic/picture">/pic/picture</a> - get picture in full resolution </li>
+    <li><a href="/pic/p_picture">/pic/p_picture</a> - show page with picture </li>
+    <li><a href="/pic/cam">/pic/cam?size=xx&maxframerate=xx</a> - stream picture</li>
+    <li><a href="/pic/p_cam">/pic/p_cam</a> - stream picture on page</li>
+    <li><a href="/pic/info">/pic/info</a> - camera picture information</li>
+    <li><a href="/2d/2d">/2d/2d?size=nn</a> - take pictures and send to stiching</li>
+    <li><a href="/3d/3d">/3d/3d?size=nn</a> - stream pictures and send 3d scan sets</li>
+</ul>
+<br>
+{% endblock %}

@@ -1,6 +1,6 @@
 from sys import platform
 from time import sleep
-from webservice_config import MAXFRAMERATE, WARMUP_TIME
+from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH
 
 # python: disable=unresolved-import,import-error
 
@@ -13,8 +13,9 @@ else:
 
 def init_camera():
     if platform=="linux":
-        camera = PiCamera()
-        camera.framerate_range =(10,MAXFRAMERATE)
+        camera = PiCamera(resolution='HD')
+        camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
+        camera.resolution = (WIDTH, HEIGHT)
         # camera.resolution =(1280,720)
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
@@ -27,6 +28,22 @@ def init_camera():
 
 def warm_up(camera):
     sleep(WARMUP_TIME)
+
+def fix_exposure(mycamera):
+    # fix the current iso, shutter, gain.. setting
+    mycamera.iso = 800
+    warm_up(mycamera)
+    mycamera.shutter_speed = mycamera.exposure_speed
+    mycamera.exposure_mode = 'off'
+    g = mycamera.awb_gains
+    mycamera.awb_mode = 'off'
+    mycamera.awb_gains = g
+
+def auto_exposure(mycamera):
+    mycamera.iso = 0
+    mycamera.shutter_speed = 0
+    mycamera.exposure_mode = 'auto'
+    mycamera.awb_mode = 'auto'
 
 def get_picture_info(camera):
     info = { 'analog_gain': camera.analog_gain,
@@ -61,12 +78,19 @@ def get_picture_info(camera):
     }
     return info
 
-def get_exposure_info(picture_info):
-    strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec)\r\n".format(picture_info['exposure_speed']/1000000, 1000000/picture_info['exposure_speed'])
-    strg += "Gain: Analog: {} Digital: {} AutoWhiteBalance: r:{} b:{}\r\n".format(
-        picture_info['analog_gain'], picture_info['digital_gain'], picture_info['awb_gains'][0],picture_info['awb_gains'][1])
+def get_exposure_info(camera):
+    exposure_speed = camera.exposure_speed
+    analog_gain = camera.analog_gain
+    digital_gain = camera.digital_gain
+    strg = ""
+    if exposure_speed:
+        strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec) ".format(exposure_speed/1000000, 1000000/exposure_speed)
+    strg += "Gain: Analog: {} Digital: {} = {:5.3f} ".format(
+        analog_gain, digital_gain, float(analog_gain * digital_gain))
+    strg += "WhiteBalance: R: {:5.3f} B: {:5.3f}".format(
+        float(camera.awb_gains[0]), float(camera.awb_gains[1]) )
     return strg
-    
+
 def get_camera_settings(camera):
     strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"
@@ -84,3 +108,18 @@ def print_settings(camera):
     strg += "FrameRateRange: " + str(camera.framerate_range) + "<br>"
     strg += "PictureSize: " + str(camera.resolution) + "<br>"
     return strg
+
+def calibrate_picture(camera):
+    sleep(WARMUP_TIME)
+    a_gain = camera.analog_gain
+    d_gain = camera.digital_gain
+    gain = float(a_gain) * float(d_gain)
+    iso = round(gain) * 100
+    cal = {
+        "exposure_speed": camera.exposure_speed,
+        "analog_gain": a_gain,
+        "digital_gain": d_gain,
+        "gain": float(a_gain) * float(camera.digital_gain),
+        "iso": int(iso)
+    }
+    return cal

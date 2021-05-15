@@ -1,10 +1,10 @@
 from sys import platform
 from datetime import datetime
+import pprint
 from fractions import Fraction
 from io import BytesIO
-from flask import Blueprint, send_file, Response, request
-from camera import init_camera, warm_up, get_camera_settings, get_picture_info, get_exposure_info
-#from webservice_config import MAXFRAMERATE, WARMUP_TIME
+from flask import Blueprint, send_file, Response, request, render_template
+from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
 
 if platform == "nt":
     from pygame.image import save_extended
@@ -15,7 +15,6 @@ def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefine
         camera.capture(fd1, format=format, quality=quality)
         fd1.truncate()
         fd1.seek(0)
-        #print(get_camera_settings(camera))
         camera.close()
         return fd1
     # windows
@@ -43,7 +42,7 @@ def scan_cont_pictures(camera):
     finally:
         stop = datetime.now()
         print("Vi lukker og slukker {:2.1f} billeder/sek".format(j/((stop-start).total_seconds())))
-        print(get_camera_settings(camera))
+        print(get_exposure_info(camera))
         camera.close()
     return stream
 
@@ -65,22 +64,26 @@ def u_picture():
     quality = request.args.get('quality', None)
     if quality:
         pic_quality=quality
-    #print(get_picture_info(camera))
-    #print()
-    print(get_exposure_info(get_picture_info(camera)))
+    print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
+
+@pic.route('/p_picture')
+def p_picture():
+    return render_template('picture.html', name="")
+
+@pic.route('/p_cam')
+def p_cam():
+    return render_template('cam.html', name="")
 
 @pic.route('/cam')
 def cam():
     camera = init_camera()
-    camera.resolution =(640,480)
-    #camera.resolution =(160,160)
-    #camera.framerate_range =(10,25)
+    #camera.resolution =(640,480)
     warm_up(camera)
-    print(get_camera_settings(camera))
+    print(get_exposure_info(camera))
     size = request.args.get('size', None)
     if size:
-        camera.resolution =(int(size),int(size))
+        camera.resolution = (int(size),int(size))
     max_frame = request.args.get('maxframerate', None)
     if max_frame:
         camera.framerate_range.high = Fraction(1, int(max_frame))
@@ -91,6 +94,6 @@ def info():
     camera = init_camera()
     warm_up(camera)
     camera_info = get_picture_info(camera)
-    print(str(camera_info))
+    pprint.pprint(camera_info)
     camera.close()
-    return Response(str(camera_info).replace('\n', '<br />'))
+    return Response(pprint.pformat(camera_info).replace('\n', '<br />'))
