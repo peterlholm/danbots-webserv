@@ -63,7 +63,7 @@ def u_picture():
     pic_quality = 85
     quality = request.args.get('quality', None)
     if quality:
-        pic_quality=quality
+        pic_quality=int(quality)
     print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
@@ -94,6 +94,6 @@ def info():
     camera = init_camera()
     warm_up(camera)
     camera_info = get_picture_info(camera)
-    pprint.pprint(camera_info)
+    #pprint.pprint(camera_info)
     camera.close()
-    return Response(pprint.pformat(camera_info).replace('\n', '<br />'))
+    return Response(pprint.pformat(camera_info).replace('\n', '<br />')+'<br><a href="/">Back</a>')
