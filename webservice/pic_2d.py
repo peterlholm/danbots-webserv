@@ -2,13 +2,16 @@ from time import sleep
 from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request, render_template
-from camera import init_camera, warm_up, get_picture_info, get_exposure_info
-from send_files import send_mem_files_bg, send_file_object
+from camera import init_camera, warm_up, get_exposure_info #get_picture_info,
+from send_files import send_mem_files_bg, send_file_object, send_api_request
+from webservice_config import  API_SERVER
 
 # python: disable=unresolved-import,import-error
 
-def send_picture(fd1, i):
-    send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
+def send_picture(fd1, picture_no):
+    filename = "picture"+str(picture_no)+'.jpg'
+    send_file_object(fd1, filename, data={'cmd':'picture','pictureinfo': "nr"}, url = API_SERVER + '2dsave')
+    #send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
 
 def capture_picture(camera):
     fd1 = BytesIO()
@@ -46,6 +49,7 @@ pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 
 @pic2d.route('/2d')
 def cam():
+    send_api_request("/2d/start")
     camera = init_camera()
     camera.resolution =(640,480)
     #camera.framerate_range =(10,25)
@@ -61,6 +65,7 @@ def p_cam():
 
 @pic2d.route('/picture')
 def picture():
+    # send one picture to API server
     camera = init_camera()
     camera.resolution =(640,480)
     #camera.framerate_range =(10,25)
@@ -70,8 +75,7 @@ def picture():
     warm_up(camera)
     fd = capture_picture(camera)
     expinfo=get_exposure_info(camera)
-    camera.close()    
-    res=send_file_object(fd, "2d.jpg", data={'2dpicture': "hhh", 'exposure': expinfo})
+    camera.close()
+    res=send_file_object(fd, "2d.jpg", data={'folder': "testfolder", 'exposure': expinfo})
     print(res)
     return Response(res)
-    

@@ -28,9 +28,11 @@ def sendfile(name):
     print (req)
     print("thread end", datetime.datetime.now())
 
-def send_file_object(file_object, file_name, data=None):
+def send_file_object(file_object, file_name, data=None, url=None):
+    if not url:
+        url=API_SERVER + API_SAVEFILE
     file_spec = {'file': (file_name, file_object) }
-    req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
+    req = requests.post(url, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
     if not req:
         print(req)
     return req
@@ -53,6 +55,15 @@ def sendmemfile(name):
         fd2 = BytesIO(fd.read())
     send_mem_files_bg(fd2, "testfile")
     print("thread end", datetime.datetime.now())
+
+def send_api_request(function, data=None):
+    url = API_SERVER + function
+    req = requests.post(url, timeout=HTTP_TIMEOUT, data=data)
+    if not req.status_code:
+        print('Noget gik galt: ', req.status_code)
+        print(req.text)
+        return False
+    return True
 
 def send_start():
     apiurl = COMPUTE_SERVER + API_START
@@ -184,9 +195,9 @@ def send_mem_files_bg (files, file_name="file", file_type="jpg", info=None, para
     th1.start()
 
 
-if __name__ == "__main__":
-    fd = open('pic_3d.py','rb')
-    fd2 = open('pic_2d.py','rb')
+# if __name__ == "__main__":
+#     fd = open('pic_3d.py','rb')
+#     fd2 = open('pic_2d.py','rb')
 
-    send_file_objects([('fil3.py', fd),('fil2.py', fd2)], {"dummy":"hhh"})
+#     send_file_objects([('fil3.py', fd),('fil2.py', fd2)], {"dummy":"hhh"})
     
