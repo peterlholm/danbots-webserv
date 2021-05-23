@@ -87,9 +87,10 @@ def get_exposure_info(camera):
         strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec) ".format(exposure_speed/1000000, 1000000/exposure_speed)
     strg += "Gain: Analog: {} Digital: {} = {:5.3f} ".format(
         analog_gain, digital_gain, float(analog_gain * digital_gain))
-    strg += "WhiteBalance: R: {:5.3f} B: {:5.3f}".format(
-        float(camera.awb_gains[0]), float(camera.awb_gains[1]) )
     return strg
+
+def get_white_balance(camera):
+    return "WhiteBalance: R: {:5.3f} B: {:5.3f}".format(float(camera.awb_gains[0]), float(camera.awb_gains[1]) )
 
 def get_camera_settings(camera):
     strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)

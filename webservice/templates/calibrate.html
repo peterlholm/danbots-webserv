@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .picture {
+        float: left;
+        margin: 10px;
+    }
+</style>
+<h2>Calibrate</h2>
+<div class="picture">
+    <img src="data:image/jpeg;base64,{{img1}}" height="480" width="640">
+    <br>
+    {{ exposure1 }}
+</div>
+<div class="picture">
+    <img src="data:image/jpeg;base64,{{img2}}" height="480">
+    <br>
+    {{ exposure2 }}
+</div>
+<div style="clear: both">
+    <form method="post">
+        <h3>
+            Contrast<input type="range" min="-100" max="100" value="0" class="slider" id="contrast" name="contrast">
+            Brightness<input type="range" min="0" max="100" value="50" class="slider" name="brightness">
+            Saturation<input type="range" min="-100" max="100" value="0" class="saturation" name="saturation">
+            ISO<input type="range" min="0" max="800" value="0" step="100" class="slider" name="iso">
+        </h3>
+
+        <h3>Exposure_mode
+            <select name="exposure_mode" id="exposure_mode">
+                <option value="auto">Auto</option>
+                <option value="off">Off</option>
+                <option value="night">Night</option>
+                <option value="nightpreview">Nightpreview</option>
+                <option value="backlight">Backlight</option>
+                <option value="spotlight">Spotlight</option>
+                <option value="sports">Sports</option>
+                <option value="snow">Snow</option>
+                <option value="beach">Beach</option>
+                <option value="verylong">Verylong</option>
+                <option value="antishake">Antishake</option>
+                <option value="fireworks">Fireworks</option>
+            </select>
+
+            Exposure_compensation<input type="range" min="-25" max="25" value="0" class="slider"
+                name="exposure_compensation">
+
+            White Balance
+            <select name="awb_mode" id="awb_mode">
+                <option value="auto">Auto</option>
+                <option value="off">Off</option>
+                <option value="sunlight">Sunlight</option>
+                <option value="cloudy">Cloudy</option>
+                <option value="shade">Shade</option>
+                <option value="tungsten">Tungsten</option>
+                <option value="fluorescent">fluorescent</option>
+                <option value="incandescent">incandescent</option>
+                <option value="flash">flash</option>
+                <option value="horizon">horizon</option>
+            </select>
+        </h3>
+        <h3>
+            Sharpness<input type="range" min="-100" max="100" value="0" class="slider" name="sharpness">
+            Shutter_speed (msec)<input type="range" min="0" max="100" value="0" class="slider" name="shutter_speed">
+
+            dynamic range compression<select name="drc_strength">
+                <option value="off">Off</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </h3>
+
+        <!-- Frame_rate<input type="range" min="1" max="100" value="0" class="slider" id="frame_rate">
+         Frame_rate-delta<input type="range" min="1" max="100" value="0" class="slider" id="frame_rate_delta"> 
+        FrameRate_Range Max: <input type="number" name="frame_rate_max" value="20"> Min: <input type="number"
+            name="frame_rate_min" value="20"> -->
+
+        <h3>
+            Meter_Mode<select name="meter_mode" id="drc_strength">
+                <option value="average">Avarage</option>
+                <option value="spot">Spot</option>
+                <option value="backlit">Backlit</option>
+                <option value="matrix">Matrix</option>
+            </select>
+
+            Resolution<select name="resolution" id="resolution">
+                <option value="VGA">VGA</option>
+                <option value="HD">HD</option>
+                <option value="1080p">1080p</option>
+                <option value="160x160">160x160</option>
+            </select>
+        </h3>
+
+        <input type="submit" name="submit" value="send">
+    </form>
+</div>
+{% endblock %}
