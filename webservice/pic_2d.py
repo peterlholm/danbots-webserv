@@ -3,14 +3,14 @@ from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request, render_template
 from camera import init_camera, warm_up, get_exposure_info #get_picture_info,
-from send_files import send_mem_files_bg, send_file_object, send_api_request
+from send_files import send_file_object, send_api_request
 from webservice_config import  API_SERVER
 
 # python: disable=unresolved-import,import-error
 
 def send_picture(fd1, picture_no):
     filename = "picture"+str(picture_no)+'.jpg'
-    send_file_object(fd1, filename, data={'cmd':'picture','pictureinfo': "nr"}, url = API_SERVER + '2dsave')
+    send_file_object(fd1, filename, data={'cmd':'picture','folder': 'save2d', 'pictureinfo': picture_no}, url = API_SERVER + 'savefile')
     #send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
 
 def capture_picture(camera):
@@ -49,7 +49,7 @@ pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 
 @pic2d.route('/2d')
 def cam():
-    send_api_request("/2d/start")
+    send_api_request("2d/start")
     camera = init_camera()
     camera.resolution =(640,480)
     #camera.framerate_range =(10,25)

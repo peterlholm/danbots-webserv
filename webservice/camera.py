@@ -11,6 +11,60 @@ else:
     import pygame.camera # pylint: disable=wrong-import-position
     #from pygame.locals import *
 
+class CameraSettings:   # pylint: disable=too-many-instance-attributes
+    camera = None
+    contrast = 0
+    brightness = 50
+    saturation = 0
+    iso = None
+    exposure_compensation = 0
+    exposure_mode = 'auto'
+    awb_mode = 'auto'
+    sharpness = 0
+    meter_mode = 'average'
+    drc_strength = 'off'
+    resolution = 'VGA'
+    shutter_speed = 0
+
+    def __init__(self, camera):
+        self.camera = camera
+        #self.reset()
+
+    def set(self):
+        self.camera.contrast = self.contrast
+        self.camera.brightness = self.brightness
+        self.camera.saturation = self.saturation
+        if self.iso:
+            self.camera.iso = self.iso
+        self.camera.exposure_compensation = self.exposure_compensation
+        self.camera.exposure_mode = self.exposure_mode
+        self.camera.awb_mode = self.awb_mode
+        self.camera.sharpness = self.sharpness
+        self.camera.meter_mode = self.meter_mode
+        self.camera.drc_strength = self.drc_strength
+        self.camera.resolution = self.resolution
+        self.camera.shutter_speed = self.shutter_speed
+
+    def reset(self):
+        self.camera.contrast = 0
+        self.camera.brightness = 50
+        self.camera.saturation = 0
+        self.iso = None
+        self.exposure_compensation = 0
+        self.exposure_mode = 'auto'
+        self.awb_mode = 'auto'
+        self.sharpness = 0
+        self.meter_mode = 'average'
+        self.drc_strength = 'off'
+        self.resolution = 'VGA'
+        self.shutter_speed = 0
+
+    def str(self):
+        return "Contrast: {} Brigthness: {} Saturation: {} Iso: {}".format(self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso)
+
+    def set_str(self):
+        return "Contrast: {} Brigthness: {} Saturation: {}".format(self.contrast, self.brightness, self.saturation)
+
 def init_camera():
     if platform=="linux":
         camera = PiCamera(resolution='HD')
