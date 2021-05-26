@@ -3,14 +3,14 @@ from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
 from camera import init_camera, warm_up #, get_camera_settings
-from send_files import send_mem_files_bg, send_start, send_file_objects
+from send_files import send_mem_files, send_mem_files_bg, send_start, send_file_objects
 from hw.led_control import set_flash, set_dias
 
 # python: disable=unresolved-import,import-error
 DEBUG = True
 
 def send_picture(fd1, i):
-    send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info="djdjdjdj" )
+    send_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info="djdjdjdj" )
     if DEBUG:
         files = [('pic1.jpg',fd1[0]),('pic2.jpg',fd1[1]),('pic3.jpg', fd1[2])]
         send_file_objects(files,data={"info":"debug3d", "no": i})

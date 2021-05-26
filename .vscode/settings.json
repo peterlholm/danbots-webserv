@@ -1,5 +1,4 @@
 {
-    "python.pythonPath": "env\\Scripts\\python.exe",
     "terminal.integrated.env.windows": {
     "FLASK_APP": "webservice",
     "FLASK_ENV":"development"
@@ -10,5 +9,8 @@
     "python.linting.pylintArgs": [
         "--init-hook",
         "import sys; sys.path.append(\"E:\\\\Arbejde\\\\DanBots\\\\DanWand\\\\danbots-webserv\\\\webservice\");"
+    ],
+    "python.analysis.extraPaths": [
+        "./webservice"
     ]
 }
