@@ -60,7 +60,8 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.shutter_speed = 0
 
     def str(self):
-        return "Contrast: {} Brigthness: {} Saturation: {} Iso: {}".format(self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso)
+        return "Contrast: {} Brigthness: {} Saturation: {} Iso: {} Exposure Compensation: {} ".format(
+            self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso, self.exposure_compensation)
 
     def set_str(self):
         return "Contrast: {} Brigthness: {} Saturation: {}".format(self.contrast, self.brightness, self.saturation)

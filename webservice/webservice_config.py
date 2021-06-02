@@ -51,3 +51,15 @@ MAXFRAMERATE = float(myconfig['camera'].get('maxframerate'))
 WARMUP_TIME = float(myconfig['camera'].get('warmup_time',1))
 HEIGHT = int(myconfig['camera'].get('height',160))
 WIDTH = int(myconfig['camera'].get('width',160))
+
+if not myconfig.has_section('capture_3d'):
+    myconfig.add_section('capture_3d')
+    myconfig['capture_3d']['exposure_compensation'] = "0"
+    myconfig['capture_3d']['flash'] = "1.0"
+    myconfig['capture_3d']['dias'] = "1.0"
+    myconfig['capture_3d']['capture_delay'] = "0.5"
+    myconfig['capture_3d']['number_pictures'] = "2"
+    myconfig['capture_3d']['picture_interval'] = "1.5"
+    save_config(myconfig)
+
+CAPTURE_3D = dict(myconfig.items('capture_3d'))

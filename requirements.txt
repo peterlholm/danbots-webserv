@@ -3,6 +3,7 @@ flask
 picamera
 gpiozero
 pigpio
+smbus
 
 #pylint
 
