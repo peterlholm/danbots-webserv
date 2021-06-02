@@ -18,6 +18,18 @@ API_STOP = 'stop3d'
 HTTP_TIMEOUT=16
 _DEBUG=False
 
+def error_handling(myfunction):
+    
+    def func(*a, **kw):   
+        try:
+            res = myfunction(*a, **kw)
+        except requests.exceptions.RequestException as ex:
+            print(ex)
+            return False
+        return res
+    return func
+
+
 def sendfile(name):
     """ Send one file from disk """
     print("thread start", datetime.datetime.now())
@@ -76,7 +88,11 @@ def send_api_request(function, data=None):
 def send_start():
     apiurl = COMPUTE_SERVER + API_START
     data_spec = {"deviceid": DEVICEID }
-    req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    try:
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    except requests.exceptions.RequestException as ex:
+        print(datetime.datetime.now(), ex)
+        return False
     if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
         print('Noget gik galt: ', req.status_code)
         print(req.text)
