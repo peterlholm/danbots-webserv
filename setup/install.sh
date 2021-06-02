@@ -12,6 +12,8 @@ ln -s /var/www/webservice/apache/webservice.conf /etc/apache2/sites-available
 
 
 sudo apt install libapache2-mod-wsgi-py3
+sudo apt install pigpiod
+
 pip3 install -r ../requirements.txt
 
 #a2ensite webservice

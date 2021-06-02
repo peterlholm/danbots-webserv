@@ -32,7 +32,11 @@ def send_file_object(file_object, file_name, data=None, url=None):
     if not url:
         url=API_SERVER + API_SAVEFILE
     file_spec = {'file': (file_name, file_object) }
-    req = requests.post(url, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
+    try:
+        req = requests.post(url, timeout=HTTP_TIMEOUT, files=file_spec, data=data)
+    except requests.exceptions.RequestException as ex:
+        print(ex)
+        return False
     if not req:
         print(req)
     return req
@@ -57,8 +61,12 @@ def sendmemfile(name):
     print("thread end", datetime.datetime.now())
 
 def send_api_request(function, data=None):
-    url = API_SERVER + function
-    req = requests.post(url, timeout=HTTP_TIMEOUT, data=data)
+    try:
+        url = API_SERVER + function
+        req = requests.post(url, timeout=HTTP_TIMEOUT, data=data)
+    except requests.exceptions.RequestException as ex:
+        print(ex)
+        return False
     if not req.status_code:
         print('Noget gik galt: ', req.status_code)
         print(req.text)

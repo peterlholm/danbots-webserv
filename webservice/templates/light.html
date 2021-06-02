@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .picture {
+        float: left;
+        margin: 10px;
+    }
+</style>
+<h2>Light Control</h2>
+
+Flash: {{flash}} 
+<br>
+Dias: {{dias}}
+<br>
+<div style="clear: both">
+    <form method="post">
+        <h3>
+            Dias<input type="range" min="0" max="1" step="0.1" value="{{dias}}" class="slider" id="dias" name="dias">
+            Flash<input type="range" min="0" max="1" step="0.1" value="{{flash}}" class="slider" name="flash">
+        </h3>
+        <input type="submit" name="submit" value="send">
+    </form>
+</div>
+{% endblock %}
