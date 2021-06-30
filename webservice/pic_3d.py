@@ -17,6 +17,7 @@ CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval'])
 EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
+JPEG_QUALITY = 100
 
 def init_3d_camera(settings):
     #print(settings.str())
@@ -40,13 +41,13 @@ def get_picture_set(camera):
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
     sleep(CAPTURE_DELAY)
-    camera.capture(fd2, format='jpeg', use_video_port=True)
+    camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd2.truncate()
     fd2.seek(0)
     set_dias(False)
     sleep(CAPTURE_DELAY)
     fd3 = BytesIO()
-    camera.capture(fd3, format='jpeg', use_video_port=True)
+    camera.capture(fd3, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd3.truncate()
     fd3.seek(0)
     set_flash(FLASH_LEVEL)
@@ -57,18 +58,57 @@ def get_pictures(camera):
     i=1
     pic_no = 1
     start = datetime.now()
+    if PICTURE_INTERVAL==0:
+        pic_modolu=1
+    else:
+        pic_modolu = int(PICTURE_INTERVAL*10)
     try:
         while True:
-            camera.capture(fd1, format='jpeg', use_video_port=True)
+            camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
             fd1.truncate()
             fd1.seek(0)
             pic = fd1.read()
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
             fd1.seek(0)
-            if i % int(PICTURE_INTERVAL*10) == 0:
+            if i % pic_modolu == 0:
                 (fd2, fd3) = get_picture_set(camera)
                 send_picture([fd1,fd2,fd3], pic_no)
+                fd1.seek(0)
+                pic_no = pic_no+1
+                if pic_no>NUMBER_PICTURES:
+                    break
+            i=i+1
+            sleep(0)
+    finally:
+        stop = datetime.now()
+        print("Closing: {:2.1f} Billeder/sek".format(i/((stop-start).total_seconds())))
+        #print(get_camera_settings(camera))
+        camera.close()
+        set_dias(False)
+        set_flash(False)
+
+def get_dias(camera):
+    fd1 = BytesIO()
+    i=1
+    pic_no = 1
+    start = datetime.now()
+    if PICTURE_INTERVAL==0:
+        pic_modolu=1
+    else:
+        pic_modolu = int(PICTURE_INTERVAL*10)
+    try:
+        while True:
+            camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
+            fd1.truncate()
+            fd1.seek(0)
+            pic = fd1.read()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
+            fd1.seek(0)
+            if i % pic_modolu == 0:
+                #(fd2, fd3) = get_picture_set(camera)
+                send_picture([fd1,fd1,fd1], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
                 if pic_no>NUMBER_PICTURES:
@@ -102,3 +142,19 @@ def cam():
     set_flash(True)
     warm_up(camera)
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@pic3d.route('/3dias')
+def cam3dias():
+    send_start()
+    camera = init_camera()
+    camera.resolution =(160,160)
+    camera.framerate_range =(10,10)
+    cam_settings = CameraSettings(camera)
+    init_3d_camera(cam_settings)
+    size = request.args.get('size', None)
+    if size:
+        camera.resolution =(int(size),int(size))
+    set_dias(True)
+    set_flash(False)
+    warm_up(camera)
+    return Response(get_dias(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
