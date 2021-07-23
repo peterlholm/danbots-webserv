@@ -148,7 +148,7 @@ def get_white_balance(camera):
     return "WhiteBalance: R: {:5.3f} B: {:5.3f}".format(float(camera.awb_gains[0]), float(camera.awb_gains[1]) )
 
 def get_camera_settings(camera):
-    strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
+    strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/(camera.exposure_speed))
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"
     strg += "Brightness {:5.3f} Contrast {:5.3f}\r\n".format(camera.brightness,camera.contrast)
     strg += "Denoise {:5.3f} Sharpness {:5.3f}\r\n".format(camera.image_denoise, camera.sharpness)

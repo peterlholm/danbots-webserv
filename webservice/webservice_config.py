@@ -42,7 +42,7 @@ if not myconfig.has_section('camera'):
     myconfig.add_section('camera')
     myconfig['camera']['minframerate'] = "5"
     myconfig['camera']['maxframerate'] = "10"
-    myconfig['camera']['warmup_time'] = "0.5"
+    myconfig['camera']['warmup_time'] = "0.1"
     myconfig['camera']['width'] = "160"
     myconfig['camera']['height'] = "160"
     save_config(myconfig)
@@ -55,11 +55,11 @@ WIDTH = int(myconfig['camera'].get('width',160))
 if not myconfig.has_section('capture_3d'):
     myconfig.add_section('capture_3d')
     myconfig['capture_3d']['exposure_compensation'] = "0"
-    myconfig['capture_3d']['flash'] = "1.0"
+    myconfig['capture_3d']['flash'] = "0.1"
     myconfig['capture_3d']['dias'] = "1.0"
-    myconfig['capture_3d']['capture_delay'] = "0.5"
-    myconfig['capture_3d']['number_pictures'] = "2"
-    myconfig['capture_3d']['picture_interval'] = "1.5"
+    myconfig['capture_3d']['capture_delay'] = "0.0"
+    myconfig['capture_3d']['number_pictures'] = "3"
+    myconfig['capture_3d']['picture_interval'] = "0.3"
     save_config(myconfig)
 
 CAPTURE_3D = dict(myconfig.items('capture_3d'))

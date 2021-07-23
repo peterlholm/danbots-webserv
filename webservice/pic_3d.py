@@ -139,7 +139,7 @@ def cam():
     if size:
         camera.resolution =(int(size),int(size))
     set_dias(False)
-    set_flash(True)
+    set_flash(FLASH_LEVEL)
     warm_up(camera)
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
