@@ -19,6 +19,9 @@ systemctl restart pigpiod.service
 
 pip3 install -r ../requirements.txt
 
+# access to own PWM module
+usermod -aG i2c danwand
+
 #a2ensite webservice
 #systemctl restart apache2
 
