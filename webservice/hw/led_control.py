@@ -32,6 +32,7 @@ else:
     lc = PiLedControll()
 
     def set_dias(val):
+        print ("setdias",val )
         lc.set_dias(val)
 
     def set_flash(val):
