@@ -19,8 +19,7 @@ HTTP_TIMEOUT=16
 _DEBUG=False
 
 def error_handling(myfunction):
-    
-    def func(*a, **kw):   
+    def func(*a, **kw):
         try:
             res = myfunction(*a, **kw)
         except requests.exceptions.RequestException as ex:

@@ -1,7 +1,9 @@
 from time import sleep
 from datetime import datetime
 from io import BytesIO
-from picamera import PiCamera
+#from picamera import PiCamera
+from camera import init_camera, get_camera_settings, CameraSettings
+
 #from shutil import copyfileobj
 
 def scan_cont_mem_set(camera, antal=100, format='jpeg'): # pylint: disable=redefined-builtin
@@ -10,11 +12,11 @@ def scan_cont_mem_set(camera, antal=100, format='jpeg'): # pylint: disable=redef
     stream = BytesIO()
     for i in camera.capture_continuous(stream, format=format, use_video_port=True): # pylint: disable=unused-variable
         j = j+1
-        stream.seek(0)
+        #stream.seek(0)
         if j>=antal:
             break
-    stream.truncate()
-    stream.seek(0)
+    #stream.truncate()
+    #stream.seek(0)
     return stream
 
 def print_settings(camera):
@@ -24,9 +26,17 @@ def print_settings(camera):
     strg += "PictureSize: " + str(camera.resolution) + "<br>"
     return strg
 
-camera = PiCamera()
+#camera = PiCamera()
+camera = init_camera()
+camera.iso = 800
+
+camera.framerate_range =(5, 50)
+camera.framerate = 80
+settings = CameraSettings(camera)
+
+print(get_camera_settings(camera))
 sleep(5)
-antal=100
+antal=200
 start =datetime.now()
 scan_cont_mem_set(camera, antal=antal)
 slut = datetime.now()
