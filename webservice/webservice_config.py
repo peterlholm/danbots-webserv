@@ -36,6 +36,13 @@ DEVICEID = myconfig.get('device','deviceid',fallback='11223344')
 API_SERVER=myconfig['server']['apiserver']
 COMPUTE_SERVER=myconfig['server']['computeserver']
 
+# hw
+
+LED=''
+if myconfig.has_section('hw'):
+    LED = myconfig['hw'].get('led','')
+
+print("Led: ", LED)
 # camera
 
 if not myconfig.has_section('camera'):
@@ -63,3 +70,6 @@ if not myconfig.has_section('capture_3d'):
     save_config(myconfig)
 
 CAPTURE_3D = dict(myconfig.items('capture_3d'))
+ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
+
+print("Zoom:", ZOOM)

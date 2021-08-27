@@ -1,10 +1,14 @@
 from time import sleep
 from gpiozero import LED, PWMLED
+from webservice_config import LED
 
 from hw.pi_led_control import PiLedControll
 
 I2C_LED_CONTROL = False
 
+if LED=='i2c':
+    I2C_LED_CONTROL = True
+    
 if I2C_LED_CONTROL:
     from hw.i2cPWM import setDias, setFlash
     print ("Using i2c LED control")

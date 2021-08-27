@@ -1,15 +1,15 @@
 from sys import platform
 from time import sleep
-from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH
+from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
 # python: disable=unresolved-import,import-error
 
 if platform == "linux":
     from picamera import PiCamera   # pylint: disable=import-error
-else:
-    import pygame
-    import pygame.camera # pylint: disable=wrong-import-position
-    #from pygame.locals import *
+# else:
+#     import pygame
+#     import pygame.camera # pylint: disable=wrong-import-position
+#     #from pygame.locals import *
 
 class CameraSettings:   # pylint: disable=too-many-instance-attributes
     camera = None
@@ -75,10 +75,16 @@ def init_camera():
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
         #camera.resolution =(160,160)
-    else:
-        pygame.camera.init()
-        camera = pygame.camera.Camera(0,(640,480))
-        camera.start()
+        print(camera.zoom)
+        if not camera.zoom:
+            camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
+        #camera.meter_mode = 'spot' # average spot backlit matrix
+        #camera.zoom = (0.15,0.15,0.9,0.9)
+        print (camera.zoom)
+    # else:
+    #     pygame.camera.init()
+    #     camera = pygame.camera.Camera(0,(640,480))
+    #     camera.start()
     return camera
 
 def warm_up(camera):

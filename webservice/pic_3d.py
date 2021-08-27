@@ -30,8 +30,8 @@ def init_3d_camera(settings):
     #print(settings.str())
     return settings
 
-def send_picture(fd1, i):
-    send_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info="djdjdjdj" )
+def send_picture(fd1, i, info=None):
+    send_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info=info )
     if DEBUG:
         files = [('pic1.jpg',fd1[0]),('pic2.jpg',fd1[1]),('pic3.jpg', fd1[2])]
         send_file_objects(files,data={"info":"debug3d", "no": i})
@@ -44,7 +44,7 @@ def get_picture_set(camera):
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd2.truncate()
     fd2.seek(0)
-    set_dias(False)
+    #set_dias(False)
     sleep(CAPTURE_DELAY)
     fd3 = BytesIO()
     camera.capture(fd3, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
@@ -127,6 +127,7 @@ pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 
 @pic3d.route('/3d')
 def cam():
+    # send 3d set to compute
     send_start()
     camera = init_camera()
     camera.resolution =(160,160)
