@@ -29,15 +29,15 @@ def error_handling(myfunction):
     return func
 
 
-def sendfile(name):
-    """ Send one file from disk """
-    print("thread start", datetime.datetime.now())
-    print(name)
-    files_spec = {'file': (name, open(name,'rb') )}
-    data_spec =None
-    req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
-    print (req)
-    print("thread end", datetime.datetime.now())
+# def sendfile(name):
+#     """ Send one file from disk """
+#     print("thread start", datetime.datetime.now())
+#     print(name)
+#     files_spec = {'file': (name, open(name,'rb') )}
+#     data_spec =None
+#     req = requests.post(API_SERVER + API_SAVEFILE, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+#     print (req)
+#     print("thread end", datetime.datetime.now())
 
 def send_file_object(file_object, file_name, data=None, url=None):
     if not url:
@@ -62,14 +62,14 @@ def send_file_objects(name_object_list, data=None):
     return req
 
 
-def sendmemfile(name):
-    """ Send one file from disk """
-    print("thread start", datetime.datetime.now())
-    print(name)
-    with open(name, 'rb') as fd:
-        fd2 = BytesIO(fd.read())
-    send_mem_files_bg(fd2, "testfile")
-    print("thread end", datetime.datetime.now())
+# def sendmemfile(name):
+#     """ Send one file from disk """
+#     print("thread start", datetime.datetime.now())
+#     print(name)
+#     with open(name, 'rb') as fd:
+#         fd2 = BytesIO(fd.read())
+#     send_mem_files_bg(fd2, "testfile")
+#     print("thread end", datetime.datetime.now())
 
 def send_api_request(function, data=None):
     try:
@@ -108,50 +108,50 @@ def send_stop():
         return False
     return True
 
-def send_files (files: str or [str], info=None, params=None):
-    """ Send a bunch of file to the server
-    :param files: filesname(s) as a sting or a list of strings
-    :param info: dict send as POST content
-    :param param: dict sends as http request Get parameters
-    :return: Result of operations
-    :rtype: Boolean
-    """
-    apiurl = COMPUTE_SERVER + API_SENDPIC
-    if _DEBUG:
-        print("SendFiles:", files, info, params)
-    files_spec=None
-    data_spec={}
-    #info_spec=None
-    if isinstance(files, list):
-        files_spec=[]
-        for myfile in files:
-            files_spec.append(('Pictures', (myfile, open(myfile,'rb'))))
-    else:
-        files_spec=[('Picture', (files, open(files,'rb')))]
+# def send_files (files: str or [str], info=None, params=None):
+#     """ Send a bunch of file to the server
+#     :param files: filesname(s) as a sting or a list of strings
+#     :param info: dict send as POST content
+#     :param param: dict sends as http request Get parameters
+#     :return: Result of operations
+#     :rtype: Boolean
+#     """
+#     apiurl = COMPUTE_SERVER + API_SENDPIC
+#     if _DEBUG:
+#         print("SendFiles:", files, info, params)
+#     files_spec=None
+#     data_spec={}
+#     #info_spec=None
+#     if isinstance(files, list):
+#         files_spec=[]
+#         for myfile in files:
+#             files_spec.append(('Pictures', (myfile, open(myfile,'rb'))))
+#     else:
+#         files_spec=[('Picture', (files, open(files,'rb')))]
 
-    if params is not None:
-        data_spec = params
+#     if params is not None:
+#         data_spec = params
 
-    if info is not None:
-        data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
-    if _DEBUG:
-        print('Data', data_spec)
-        print ("filespec", files_spec)
-    try:
-        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
-    except requests.exceptions.RequestException as ex:
-        print(ex)
-        return False
+#     if info is not None:
+#         data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
+#     if _DEBUG:
+#         print('Data', data_spec)
+#         print ("filespec", files_spec)
+#     try:
+#         req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+#     except requests.exceptions.RequestException as ex:
+#         print(ex)
+#         return False
 
-    if req.status_code == requests.codes.ok:  #pylint: disable=no-member
-        if _DEBUG:
-            print('det gik godt')
-            print(req.text)
-        return True
+#     if req.status_code == requests.codes.ok:  #pylint: disable=no-member
+#         if _DEBUG:
+#             print('det gik godt')
+#             print(req.text)
+#         return True
 
-    print('Noget gik galt: ', req.status_code)
-    print(req.text)
-    return False
+#     print('Noget gik galt: ', req.status_code)
+#     print(req.text)
+#     return False
 
 def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=None):
     """ Send a bunch of memmory file to the server

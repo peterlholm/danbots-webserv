@@ -6,5 +6,5 @@ flask
 pylint
 
 # win
-pygame
-videocapture
+#pygame
+#videocapture

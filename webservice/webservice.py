@@ -1,6 +1,6 @@
 #import os
 from flask import Flask, render_template #, request, session, redirect
-from version import VERSION, INSTALLED
+from webservice.version import VERSION, INSTALLED
 from picture import pic
 from pic_2d import pic2d
 from pic_3d import pic3d
