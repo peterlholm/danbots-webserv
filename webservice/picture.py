@@ -5,6 +5,7 @@ from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
+from hw.led_control import set_dias
 
 if platform == "nt":
     from pygame.image import save_extended
@@ -64,6 +65,14 @@ def u_picture():
     quality = request.args.get('quality', None)
     if quality:
         pic_quality=int(quality)
+    dias = 0
+    if request.args.get('dias'):
+        dias = 1
+    if dias:
+        print("turn dias on", dias)
+        set_dias(1)
+    else:
+        set_dias(0)
     print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 

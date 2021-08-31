@@ -170,7 +170,7 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
     files_spec=None
     data_spec={}
     #info_spec=None
-    namelist =['color_picture','french_picture','noLight_picture']
+    namelist =['color_picture','dias_picture','noLight_picture']
     if isinstance(files,list):
         files_spec=[]
         i = 1
@@ -190,6 +190,9 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
 
     if info is not None:
         data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
+    else:
+        data_spec = { **data_spec, "deviceid": DEVICEID}
+
     if _DEBUG:
         print('Data', data_spec)
         print ("filespec", files_spec)

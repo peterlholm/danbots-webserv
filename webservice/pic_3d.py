@@ -11,12 +11,12 @@ DEBUG = True
 
 # DIAS_LEVEL = 100
 # FLASH_LEVEL = 100
-DIAS_LEVEL = float(CAPTURE_3D['dias'])
-FLASH_LEVEL = float(CAPTURE_3D['flash'])
-CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])
+DIAS_LEVEL = float(CAPTURE_3D['dias'])                  # light level for dias
+FLASH_LEVEL = float(CAPTURE_3D['flash'])                # light level for flash 
+CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])      # delay to setle light meter
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
-PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval'])
-EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
+PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
+EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation']) 
 JPEG_QUALITY = 100
 
 def init_3d_camera(settings):
@@ -88,7 +88,9 @@ def get_pictures(camera):
         set_dias(False)
         set_flash(False)
 
-def get_dias(camera):
+def get_dias(camera, number_pictures=None):
+    if not number_pictures:
+        number_pictures = NUMBER_PICTURES
     fd1 = BytesIO()
     i=1
     pic_no = 1
@@ -107,11 +109,11 @@ def get_dias(camera):
                 b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
             fd1.seek(0)
             if i % pic_modolu == 0:
-                #(fd2, fd3) = get_picture_set(camera)
-                send_picture([fd1,fd1,fd1], pic_no)
+                (fd2, fd3) = get_picture_set(camera)
+                send_picture([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
-                if pic_no>NUMBER_PICTURES:
+                if pic_no>number_pictures:
                     break
             i=i+1
             sleep(0)
@@ -158,4 +160,4 @@ def cam3dias():
     set_dias(True)
     set_flash(False)
     warm_up(camera)
-    return Response(get_dias(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_dias(camera, 5),mimetype='multipart/x-mixed-replace; boundary=frame')
