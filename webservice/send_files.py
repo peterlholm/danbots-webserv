@@ -3,7 +3,7 @@
 #
 import threading
 import datetime
-from io import BytesIO, open
+#from io import BytesIO, open
 import requests
 from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
@@ -12,11 +12,12 @@ API_SENDPIC = 'sendpic'
 API_SAVEFILE = 'savefile'
 # compute
 API_SCAN3D = 'scan3d'
+API_SAVE3D = 'save3d'
 API_START = 'start3d'
 API_STOP = 'stop3d'
 
 HTTP_TIMEOUT=16
-_DEBUG=False
+_DEBUG=True
 
 def error_handling(myfunction):
     def func(*a, **kw):
@@ -101,7 +102,11 @@ def send_start():
 def send_stop():
     apiurl = COMPUTE_SERVER + API_STOP
     data_spec = {"deviceid": DEVICEID }
-    req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    try:
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    except requests.exceptions.RequestException as ex:
+        print(datetime.datetime.now(), ex)
+        return False
     if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
         print('Noget gik galt: ', req.status_code)
         print(req.text)
@@ -192,6 +197,57 @@ def send_mem_files (files, file_name="file", file_type="jpg", info=None, params=
         data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
     else:
         data_spec = { **data_spec, "deviceid": DEVICEID}
+
+    if _DEBUG:
+        print('Data', data_spec)
+        print ("filespec", files_spec)
+    try:
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+    except requests.exceptions.RequestException as ex:
+        print(ex)
+        return False
+
+    if req.status_code == requests.codes.ok:  #pylint: disable=no-member
+        if _DEBUG:
+            print('det gik godt')
+            print(req.text)
+        return True
+    print('Noget gik galt: ', req.status_code)
+    print(req.text)
+    return False
+
+def save_mem_files (files, file_name="file", file_type="jpg", info=None, params=None):
+    """ SAVE a bunch of memmory file to the server with save3d
+    :param files: fd(s)  or a list of fd(s)
+    :param filename: str
+    :param file_type: type of file
+    :param info: dict send as POST content
+    :param param: dict sends as http request Get parameters
+    :return: Result of operations
+    :rtype: Boolean
+    """
+    apiurl = COMPUTE_SERVER + API_SAVEFILE
+    if _DEBUG:
+        print("SendFiles:", files, info, params)
+    files_spec=None
+    data_spec={}
+    #info_spec=None
+    namelist =['color_picture','dias_picture','noLight_picture']
+    if isinstance(files,list):
+        files_spec=[]
+        i = 1
+        for fil in files:
+            fil.seek(0)
+            filename = file_name + str(i) + '.' + file_type
+            #print(filename)
+            files_spec.append((namelist.pop(0), (filename, fil)))
+            i = i+1
+    else:
+        filename = file_name + "." + file_type
+        files.seek(0)
+        files_spec={'Picture': (filename, files)}
+
+    data_spec = { **data_spec, "deviceid": DEVICEID}
 
     if _DEBUG:
         print('Data', data_spec)

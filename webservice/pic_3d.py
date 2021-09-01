@@ -3,7 +3,7 @@ from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
 from camera import init_camera, warm_up, CameraSettings #, get_camera_settings
-from send_files import send_mem_files, send_mem_files_bg, send_start, send_file_objects
+from send_files import send_mem_files, send_mem_files_bg, save_mem_files, send_start, send_stop, send_file_objects
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH
 # python: disable=unresolved-import,import-error
@@ -12,11 +12,11 @@ DEBUG = True
 # DIAS_LEVEL = 100
 # FLASH_LEVEL = 100
 DIAS_LEVEL = float(CAPTURE_3D['dias'])                  # light level for dias
-FLASH_LEVEL = float(CAPTURE_3D['flash'])                # light level for flash 
+FLASH_LEVEL = float(CAPTURE_3D['flash'])                # light level for flash
 CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])      # delay to setle light meter
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
-EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation']) 
+EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
 JPEG_QUALITY = 100
 
 def init_3d_camera(settings):
@@ -31,12 +31,18 @@ def init_3d_camera(settings):
     return settings
 
 def send_picture(fd1, i, info=None):
+    # used by /3d
     send_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info=info )
     if DEBUG:
         files = [('pic1.jpg',fd1[0]),('pic2.jpg',fd1[1]),('pic3.jpg', fd1[2])]
         send_file_objects(files,data={"info":"debug3d", "no": i})
 
+def send_dias(fd1, i, info=None):
+    # used by /3dias
+    save_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info=info )
+
 def get_picture_set(camera):
+    # used by /3d
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
@@ -54,6 +60,7 @@ def get_picture_set(camera):
     return (fd2, fd3)
 
 def get_pictures(camera):
+    # used by /3d
     fd1 = BytesIO()
     i=1
     pic_no = 1
@@ -87,8 +94,12 @@ def get_pictures(camera):
         camera.close()
         set_dias(False)
         set_flash(False)
+        print("send stop")
+        send_stop()
+        print("finis")
 
 def get_dias(camera, number_pictures=None):
+    # used by /3dias
     if not number_pictures:
         number_pictures = NUMBER_PICTURES
     fd1 = BytesIO()
@@ -124,6 +135,8 @@ def get_dias(camera, number_pictures=None):
         camera.close()
         set_dias(False)
         set_flash(False)
+        send_stop()
+
 
 pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 
@@ -160,4 +173,4 @@ def cam3dias():
     set_dias(True)
     set_flash(False)
     warm_up(camera)
-    return Response(get_dias(camera, 5),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_dias(camera, 10),mimetype='multipart/x-mixed-replace; boundary=frame')
