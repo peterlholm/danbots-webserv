@@ -121,7 +121,7 @@ def get_dias(camera, number_pictures=None):
             fd1.seek(0)
             if i % pic_modolu == 0:
                 (fd2, fd3) = get_picture_set(camera)
-                send_picture([fd1,fd2,fd3], pic_no)
+                send_dias([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
                 if pic_no>number_pictures:

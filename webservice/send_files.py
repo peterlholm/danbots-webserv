@@ -226,7 +226,7 @@ def save_mem_files (files, file_name="file", file_type="jpg", info=None, params=
     :return: Result of operations
     :rtype: Boolean
     """
-    apiurl = COMPUTE_SERVER + API_SAVEFILE
+    apiurl = COMPUTE_SERVER + API_SAVE3D
     if _DEBUG:
         print("SendFiles:", files, info, params)
     files_spec=None
@@ -246,6 +246,9 @@ def save_mem_files (files, file_name="file", file_type="jpg", info=None, params=
         filename = file_name + "." + file_type
         files.seek(0)
         files_spec={'Picture': (filename, files)}
+    
+    if params is not None:
+        data_spec = params
 
     data_spec = { **data_spec, "deviceid": DEVICEID}
 
