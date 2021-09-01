@@ -75,12 +75,12 @@ def init_camera():
         #camera.resolution =(2592,1944)
         #camera.resolution =(640,480)
         #camera.resolution =(160,160)
-        print(camera.zoom)
+        #print(camera.zoom)
         if not camera.zoom:
             camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
         #camera.meter_mode = 'spot' # average spot backlit matrix
         #camera.zoom = (0.15,0.15,0.9,0.9)
-        print (camera.zoom)
+        #print (camera.zoom)
     # else:
     #     pygame.camera.init()
     #     camera = pygame.camera.Camera(0,(640,480))

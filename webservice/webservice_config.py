@@ -38,11 +38,11 @@ COMPUTE_SERVER=myconfig['server']['computeserver']
 
 # hw
 
-LED=''
+LEDHW=''
 if myconfig.has_section('hw'):
     LED = myconfig['hw'].get('led','')
 
-print("Led: ", LED)
+print("Led: ", LEDHW)
 # camera
 
 if not myconfig.has_section('camera'):

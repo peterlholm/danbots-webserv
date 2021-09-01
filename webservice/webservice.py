@@ -1,6 +1,6 @@
 #import os
 from flask import Flask, render_template #, request, session, redirect
-from webservice.version import VERSION, INSTALLED
+from version import VERSION, INSTALLED
 from picture import pic
 from pic_2d import pic2d
 from pic_3d import pic3d
@@ -22,7 +22,6 @@ def home1():
 @app.route('/version')
 def version():
     return "Webservice " + VERSION + " installed: " + INSTALLED
-
 
 if __name__ == '__main__':
     print("script server running version "+ VERSION + " installed: " + INSTALLED)
