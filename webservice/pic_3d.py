@@ -2,12 +2,12 @@ from time import sleep
 from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
-from camera import init_camera, warm_up, CameraSettings #, get_camera_settings
+from camera import auto_exposure, fix_exposure, get_exposure_info, init_camera, warm_up, CameraSettings #, get_camera_settings
 from send_files import send_mem_files, send_mem_files_bg, save_mem_files, send_start, send_stop, send_file_objects
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH
 # python: disable=unresolved-import,import-error
-DEBUG = True
+DEBUG = False
 
 # DIAS_LEVEL = 100
 # FLASH_LEVEL = 100
@@ -43,19 +43,24 @@ def send_dias(fd1, i, info=None):
 
 def get_picture_set(camera):
     # used by /3d
+    print ("flash", get_exposure_info(camera))
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
     sleep(CAPTURE_DELAY)
+    print ("Dias", get_exposure_info(camera))
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd2.truncate()
     fd2.seek(0)
-    #set_dias(False)
+    fix_exposure(camera)
+    set_dias(False)
     sleep(CAPTURE_DELAY)
+    print ("dark", get_exposure_info(camera))
     fd3 = BytesIO()
     camera.capture(fd3, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd3.truncate()
     fd3.seek(0)
+    auto_exposure(camera)
     set_flash(FLASH_LEVEL)
     return (fd2, fd3)
 
@@ -94,9 +99,7 @@ def get_pictures(camera):
         camera.close()
         set_dias(False)
         set_flash(False)
-        print("send stop")
         send_stop()
-        print("finis")
 
 def get_dias(camera, number_pictures=None):
     # used by /3dias
@@ -120,6 +123,7 @@ def get_dias(camera, number_pictures=None):
                 b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
             fd1.seek(0)
             if i % pic_modolu == 0:
+                print (pic_no, get_exposure_info(camera))
                 (fd2, fd3) = get_picture_set(camera)
                 send_dias([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
@@ -170,7 +174,15 @@ def cam3dias():
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
-    set_dias(True)
-    set_flash(False)
+    print (get_exposure_info(camera))
+    set_dias(False)
+    set_flash(True)
+    print (get_exposure_info(camera))
     warm_up(camera)
+    print (get_exposure_info(camera))
+    warm_up(camera)
+    print (get_exposure_info(camera))
+    warm_up(camera)
+    print (get_exposure_info(camera))
+
     return Response(get_dias(camera, 10),mimetype='multipart/x-mixed-replace; boundary=frame')

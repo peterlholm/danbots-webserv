@@ -17,7 +17,7 @@ API_START = 'start3d'
 API_STOP = 'stop3d'
 
 HTTP_TIMEOUT=16
-_DEBUG=True
+_DEBUG=False
 
 def error_handling(myfunction):
     def func(*a, **kw):

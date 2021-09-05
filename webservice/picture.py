@@ -65,14 +65,14 @@ def u_picture():
     quality = request.args.get('quality', None)
     if quality:
         pic_quality=int(quality)
-    dias = 0
-    if request.args.get('dias'):
-        dias = 1
+    dias = request.args.get('dias',0)
+    
+    print("Dias:", dias)
     if dias:
-        print("turn dias on", dias)
-        set_dias(1)
+         set_dias(1)
     else:
         set_dias(0)
+        print("set dias 0")
     print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 

@@ -92,13 +92,15 @@ def warm_up(camera):
 
 def fix_exposure(mycamera):
     # fix the current iso, shutter, gain.. setting
-    mycamera.iso = 800
-    warm_up(mycamera)
+    #mycamera.iso = 800
+    #warm_up(mycamera)
+    print ("Fixint at", get_exposure_info(mycamera))
     mycamera.shutter_speed = mycamera.exposure_speed
     mycamera.exposure_mode = 'off'
     g = mycamera.awb_gains
     mycamera.awb_mode = 'off'
-    mycamera.awb_gains = g
+    #mycamera.awb_gains = g
+    print ("Fixed at", get_exposure_info(mycamera))
 
 def auto_exposure(mycamera):
     mycamera.iso = 0
