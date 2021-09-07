@@ -3,7 +3,7 @@ from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
 from camera import auto_exposure, fix_exposure, get_exposure_info, init_camera, warm_up, CameraSettings #, get_camera_settings
-from send_files import send_mem_files, send_mem_files_bg, save_mem_files, send_start, send_stop, send_file_objects
+from send_files import send_mem_files, save_mem_files, send_start, send_stop, send_file_objects #, send_mem_files_bg
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH
 # python: disable=unresolved-import,import-error
