@@ -98,7 +98,7 @@ def fix_exposure(mycamera):
     mycamera.shutter_speed = mycamera.exposure_speed
     mycamera.exposure_mode = 'off'
     g = mycamera.awb_gains
-    mycamera.awb_mode = 'off'
+    #mycamera.awb_mode = 'off'
     #mycamera.awb_gains = g
     print ("Fixed at", get_exposure_info(mycamera))
 
