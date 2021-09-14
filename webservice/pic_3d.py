@@ -1,4 +1,4 @@
-from time import sleep
+
 from datetime import datetime
 from io import BytesIO
 from flask import Blueprint, Response, request
@@ -7,6 +7,8 @@ from send_files import send_mem_files, save_mem_files, send_start, send_stop, se
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH
 # python: disable=unresolved-import,import-error
+from time import sleep
+
 DEBUG = False
 
 # DIAS_LEVEL = 100

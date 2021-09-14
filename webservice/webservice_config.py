@@ -42,7 +42,7 @@ LEDHW=''
 if myconfig.has_section('hw'):
     LEDHW = myconfig['hw'].get('led','')
 
-print("Led: ", LEDHW)
+#print("Led: ", LEDHW)
 # camera
 
 if not myconfig.has_section('camera'):
@@ -72,4 +72,16 @@ if not myconfig.has_section('capture_3d'):
 CAPTURE_3D = dict(myconfig.items('capture_3d'))
 ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
 
-print("Zoom:", ZOOM)
+if not myconfig.has_section('capture_2d'):
+    myconfig.add_section('capture_2d')
+    #myconfig['capture_2d']['exposure_compensation'] = "0"
+    myconfig['capture_2d']['flash'] = "0.2"
+    myconfig['capture_2d']['capture_delay'] = "0.5"
+    myconfig['capture_2d']['number_pictures'] = "10"
+    myconfig['capture_2d']['picture_interval'] = "1.0"
+    save_config(myconfig)
+
+CAPTURE_2D = dict(myconfig.items('capture_2d'))
+
+
+#print("Zoom:", ZOOM)

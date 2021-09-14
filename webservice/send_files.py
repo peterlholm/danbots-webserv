@@ -246,7 +246,7 @@ def save_mem_files (files, file_name="file", file_type="jpg", info=None, params=
         filename = file_name + "." + file_type
         files.seek(0)
         files_spec={'Picture': (filename, files)}
-    
+
     if params is not None:
         data_spec = params
 

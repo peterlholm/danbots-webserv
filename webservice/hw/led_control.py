@@ -11,7 +11,7 @@ if LEDHW=='i2c':
   
 if I2C_LED_CONTROL:
     from hw.i2cPWM import setDias, setFlash
-    print ("Using i2c LED control")
+    #print ("Using i2c LED control")
 
     def set_dias(val):
         setDias(val*100)
