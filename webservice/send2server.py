@@ -2,13 +2,16 @@
 # send request to server
 #
 import threading
+import os.path
 #import datetime
 #from io import BytesIO, open
 import requests
 from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
+SENDFILES = "sendfiles"
+
 HTTP_TIMEOUT=5
-_DEBUG=False
+_DEBUG=True
 
 def send_api_request(function, post_data=None, url=API_SERVER):
     params = {"deviceid": DEVICEID}
@@ -68,6 +71,52 @@ def post_file_objects(function, name_object_list, params=None,url=COMPUTE_SERVER
         print(req)
     return req
 
+def send_files (files: str or [str], info=None, params=None, url=COMPUTE_SERVER):
+    """ Send a bunch of file to the server
+    :param files: filesname(s) as a sting or a list of strings
+    :param info: dict send as POST content
+    :param param: dict sends as http request Get parameters
+    :return: Result of operations
+    :rtype: Boolean
+    """
+    apiurl = url + SENDFILES
+    if _DEBUG:
+        print("SendFiles:", files, info, params)
+    files_spec=None
+    data_spec={}
+    #info_spec=None
+    if isinstance(files, list):
+        files_spec=[]
+        for myfile in files:
+            filename = os.path.basename(myfile)
+            files_spec.append(('files', (filename, open(myfile,'rb'))))
+    else:
+        files_spec=[('files', (files, open(files,'rb')))]
+
+    if params is not None:
+        data_spec = params
+
+    if info is not None:
+        data_spec = { **data_spec, "info": info, "deviceid": DEVICEID}
+    if _DEBUG:
+        print('Data', data_spec)
+        print ("filespec", files_spec)
+    try:
+        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=data_spec)
+    except requests.exceptions.RequestException as ex:
+        print(ex)
+        return False
+
+    if req.status_code == requests.codes.ok:  #pylint: disable=no-member
+        if _DEBUG:
+            print('det gik godt')
+            print(req.text)
+        return True
+
+    print('Noget gik galt: ', req.status_code)
+    print(req.text)
+    return False
+
 param= {
     "my": "peter",
     "ole": 0
@@ -75,3 +124,6 @@ param= {
 }
 
 #send_api_request("savefile", post_data=param)
+
+filer = ["/tmp/calib/color.jpg", "/tmp/calib/color.json"]
+send_files(filer)
