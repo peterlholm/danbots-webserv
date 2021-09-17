@@ -6,7 +6,7 @@ from camera import init_camera, warm_up, get_exposure_info #get_picture_info,
 from send_files import send_file_object #, send_api_request
 from webservice_config import API_SERVER, COMPUTE_SERVER, CAPTURE_2D
 from hw.led_control import set_flash
-from send2server import send_api_request, send_api_request_bg, post_file_object
+from send2server import send_api_request,  post_file_object # send_api_request_bg,
 
 # python: disable=unresolved-import,import-error
 

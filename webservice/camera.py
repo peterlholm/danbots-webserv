@@ -141,6 +141,16 @@ def get_picture_info(camera):
     }
     return info
 
+def get_picture_info_json(camera):
+    info = get_picture_info(camera)
+    info['analog_gain'] =float(info['analog_gain'])
+    info['digital_gain'] =float(info['digital_gain'])
+    info['awb_gains'] =(float(info['awb_gains'][0]),float(info['awb_gains'][1]))
+    info['framerate'] =float(info['framerate'])
+    info['framerate_range'] = None
+    info['exposure_speed'] = info['exposure_speed'] / 1000000.0
+    return info
+
 def get_exposure_info(camera):
     exposure_speed = camera.exposure_speed
     analog_gain = camera.analog_gain

@@ -1,22 +1,29 @@
+import os
 from io import BytesIO
+from time import sleep
 import base64
+import json
 from flask import Blueprint, render_template, request, Markup # Response, send_file,
-from camera import init_camera, warm_up, CameraSettings, get_exposure_info, get_white_balance
+from camera import init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
 from hw.led_control import set_dias, set_flash, get_dias, get_flash
 calibrate = Blueprint('calibrate', __name__, url_prefix='/calibrate')
 
-def capture_picture(camera):
+def capture_picture(mycamera):
     fd1 = BytesIO()
-    camera.capture(fd1, format='jpeg', use_video_port=False)
+    mycamera.capture(fd1, format='jpeg', use_video_port=False)
     fd1.seek(0)
     return fd1
 
+def write_picture_info( filename, info):
+    with open(filename, 'w') as outfile:
+        json.dump(info, outfile)
+
 @calibrate.route('/test', methods=['GET', 'POST'])
 def test():
-    camera = init_camera()
-    camera.resolution =(640,480)
-    warm_up(camera)
-    settings = CameraSettings(camera)
+    mycamera = init_camera()
+    mycamera.resolution =(640,480)
+    warm_up(mycamera)
+    settings = CameraSettings(mycamera)
     dias = None
     flash = None
     if request.method == 'POST':
@@ -37,8 +44,8 @@ def test():
         flash = request.form.get('flash')
     print ("Flash", flash)
     print ("Dias", dias)
-    fd = capture_picture(camera)
-    exposure1 = Markup(get_exposure_info(camera) + "<br>" + get_white_balance(camera))
+    fd = capture_picture(mycamera)
+    exposure1 = Markup(get_exposure_info(mycamera) + "<br>" + get_white_balance(mycamera))
     img1 = base64.b64encode(fd.getvalue()).decode()
     settings.set()
     mysettings = "Camera: " + settings.str()
@@ -46,11 +53,11 @@ def test():
         set_flash(True)
     if dias:
         set_dias(True)
-    warm_up(camera)
-    fd2 = capture_picture(camera)
-    exposure2 = Markup(get_exposure_info(camera)+ "<br>" + get_white_balance(camera) + " " + mysettings)
+    warm_up(mycamera)
+    fd2 = capture_picture(mycamera)
+    exposure2 = Markup(get_exposure_info(mycamera)+ "<br>" + get_white_balance(mycamera) + " " + mysettings)
     img2 = base64.b64encode(fd2.getvalue()).decode()
-    camera.close()
+    mycamera.close()
     set_flash(False)
     set_dias(False)
     return render_template('calibrate.html', header="Calibrate", img1=img1, img2=img2, exposure1=exposure1,exposure2=exposure2)
@@ -66,3 +73,53 @@ def light():
         set_dias(dias)
         set_flash(flash)
     return render_template('light.html', header="Light", dias=dias, flash=flash)
+
+@calibrate.route('/camera', methods=['GET', 'POST'])
+def camera():
+    os.makedirs("/tmp/calib", exist_ok=True)
+    mycamera = init_camera()
+    #camera.resolution =(640,480)
+    mycamera.resolution ='HD'
+    warm_up(mycamera)
+    #normal
+    mycamera.capture('/tmp/calib/color.png', use_video_port=False)
+    #print(get_picture_info_json(mycamera))
+    mycamera.capture('/tmp/calib/color.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/color.json", get_picture_info_json(mycamera))
+    #dias
+    set_dias(1)
+    sleep(5)
+    mycamera.capture('/tmp/calib/dias.png', use_video_port=False)
+    mycamera.capture('/tmp/calib/dias.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/dias.json", get_picture_info_json(mycamera))
+    #full flash
+    set_dias(0)
+    set_flash(1)
+    sleep(5)
+    mycamera.capture('/tmp/calib/flash.png', use_video_port=False)
+    mycamera.capture('/tmp/calib/flash.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/flash.json", get_picture_info_json(mycamera))
+    fix_exposure(mycamera)
+    #dark
+    set_flash(0)
+    sleep(5)
+    mycamera.capture('/tmp/calib/nolight.png', use_video_port=False)
+    mycamera.capture('/tmp/calib/nolight.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/nolight.json", get_picture_info_json(mycamera))
+    auto_exposure(mycamera)
+    #low flash
+    set_dias(0)
+    set_flash(0.1)
+    sleep(5)
+    mycamera.capture('/tmp/calib/flash01.png', use_video_port=False)
+    mycamera.capture('/tmp/calib/flash01.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/flash01.json", get_picture_info_json(mycamera))
+    fix_exposure(mycamera)
+    set_flash(0)
+    sleep(5)
+    mycamera.capture('/tmp/calib/nolight01.png', use_video_port=False)
+    mycamera.capture('/tmp/calib/nolight01.jpg', use_video_port=False)
+    write_picture_info("/tmp/calib/nolight01.json", get_picture_info_json(mycamera))
+    auto_exposure(mycamera)
+    mycamera.close()
+    return "alt gik godt"
