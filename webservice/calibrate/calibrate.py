@@ -3,9 +3,12 @@ from io import BytesIO
 from time import sleep
 import base64
 import json
-from flask import Blueprint, render_template, request, Markup # Response, send_file,
+from flask import Blueprint, render_template, request, Markup
+#from requests.api import post # Response, send_file,
 from camera import init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
 from hw.led_control import set_dias, set_flash, get_dias, get_flash
+from send2server import send_files
+
 calibrate = Blueprint('calibrate', __name__, url_prefix='/calibrate')
 
 def capture_picture(mycamera):
@@ -76,10 +79,13 @@ def light():
 
 @calibrate.route('/camera', methods=['GET', 'POST'])
 def camera():
+    sleeptime = 1
     os.makedirs("/tmp/calib", exist_ok=True)
     mycamera = init_camera()
     #camera.resolution =(640,480)
     mycamera.resolution ='HD'
+    set_dias(0)
+    set_flash(0)
     warm_up(mycamera)
     #normal
     mycamera.capture('/tmp/calib/color.png', use_video_port=False)
@@ -88,21 +94,21 @@ def camera():
     write_picture_info("/tmp/calib/color.json", get_picture_info_json(mycamera))
     #dias
     set_dias(1)
-    sleep(5)
+    sleep(sleeptime)
     mycamera.capture('/tmp/calib/dias.png', use_video_port=False)
     mycamera.capture('/tmp/calib/dias.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/dias.json", get_picture_info_json(mycamera))
     #full flash
     set_dias(0)
     set_flash(1)
-    sleep(5)
+    sleep(sleeptime)
     mycamera.capture('/tmp/calib/flash.png', use_video_port=False)
     mycamera.capture('/tmp/calib/flash.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/flash.json", get_picture_info_json(mycamera))
     fix_exposure(mycamera)
     #dark
     set_flash(0)
-    sleep(5)
+    sleep(sleeptime)
     mycamera.capture('/tmp/calib/nolight.png', use_video_port=False)
     mycamera.capture('/tmp/calib/nolight.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/nolight.json", get_picture_info_json(mycamera))
@@ -110,16 +116,30 @@ def camera():
     #low flash
     set_dias(0)
     set_flash(0.1)
-    sleep(5)
+    sleep(sleeptime)
     mycamera.capture('/tmp/calib/flash01.png', use_video_port=False)
     mycamera.capture('/tmp/calib/flash01.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/flash01.json", get_picture_info_json(mycamera))
     fix_exposure(mycamera)
     set_flash(0)
-    sleep(5)
+    sleep(sleeptime)
     mycamera.capture('/tmp/calib/nolight01.png', use_video_port=False)
     mycamera.capture('/tmp/calib/nolight01.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/nolight01.json", get_picture_info_json(mycamera))
     auto_exposure(mycamera)
     mycamera.close()
+    filelist = ['/tmp/calib/color.png',
+                '/tmp/calib/color.jpg', '/tmp/calib/color.json',
+                '/tmp/calib/dias.png', '/tmp/calib/dias.jpg', '/tmp/calib/dias.json',
+                '/tmp/calib/flash.png', '/tmp/calib/flash.jpg', '/tmp/calib/flash.json',
+                '/tmp/calib/nolight.png', '/tmp/calib/nolight.jpg', '/tmp/calib/nolight.json',
+                '/tmp/calib/flash01.png', '/tmp/calib/flash01.jpg', '/tmp/calib/flash01.json',
+                '/tmp/calib/nolight01.png', '/tmp/calib/nolight01.jpg', '/tmp/calib/nolight01.json']
+
+    param = {"cmd": "calibrate"}
+    res = send_files(filelist, post_data=param)
+    if res:
+        print("det gik godt")
+    else:
+        print("det gik skidt")
     return "alt gik godt"
