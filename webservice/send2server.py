@@ -105,7 +105,8 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER):
         if _DEBUG:
             print('det gik godt')
             print(req.text)
-        return True
+        print (req.json())
+        return req.json()
 
     print('Noget gik galt: ', req.status_code)
     print(req.text)

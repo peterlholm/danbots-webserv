@@ -138,8 +138,9 @@ def camera():
 
     param = {"cmd": "calibrate"}
     res = send_files(filelist, post_data=param)
+    print (res)
     if res:
-        print("det gik godt")
+        return res
     else:
         print("det gik skidt")
     return "alt gik godt"
