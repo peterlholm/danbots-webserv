@@ -5,7 +5,7 @@ from flask import Blueprint, Response, request
 from camera import auto_exposure, fix_exposure, get_exposure_info, init_camera, warm_up, CameraSettings #, get_camera_settings
 from send_files import send_mem_files, save_mem_files, send_start, send_stop, send_file_objects #, send_mem_files_bg
 from hw.led_control import set_flash, set_dias
-from webservice_config import CAPTURE_3D, HEIGHT, WIDTH
+from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, ZOOM
 # python: disable=unresolved-import,import-error
 from time import sleep
 
@@ -19,6 +19,8 @@ CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])      # delay to setle light m
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
 EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
+#ZOOM = float(CAPTURE_3D['zoom'])
+
 JPEG_QUALITY = 100
 
 def init_3d_camera(settings):
@@ -28,8 +30,10 @@ def init_3d_camera(settings):
     settings.resolution=(WIDTH, HEIGHT)
     settings.exposure_compensation=EXPOSURE_COMPENSATION
     #print(settings.str())
+    #settings.zoom = (ZOOM, ZOOM, 1-ZOOM, 1-ZOOM)
+    #print (settings.zoom)
     settings.set()
-    #print(settings.str())
+    print(settings.str())
     return settings
 
 def send_picture(fd1, i, info=None):

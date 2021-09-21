@@ -2,21 +2,11 @@
 # read config and generate global coonstants
 #
 import os
-#import time
-#import datetime
 import configparser
-#import requests
-#import signal
 
 MYDEBUG=False
 WINDOWS=False
 CONFIGFILE="/etc/danwand.conf"
-
-if os.name=='nt':
-    CONFIGFILE=r"..\..\danwand.conf"
-    WINDOWS=True
-else:
-    pass
 
 if MYDEBUG:
     print ("Reading config file")
@@ -58,6 +48,9 @@ MAXFRAMERATE = float(myconfig['camera'].get('maxframerate'))
 WARMUP_TIME = float(myconfig['camera'].get('warmup_time',1))
 HEIGHT = int(myconfig['camera'].get('height',160))
 WIDTH = int(myconfig['camera'].get('width',160))
+ZOOM = float(myconfig['camera'].get('zoom',1))
+
+print ("Z", ZOOM)
 
 if not myconfig.has_section('capture_3d'):
     myconfig.add_section('capture_3d')
@@ -70,7 +63,7 @@ if not myconfig.has_section('capture_3d'):
     save_config(myconfig)
 
 CAPTURE_3D = dict(myconfig.items('capture_3d'))
-ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
+#ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
 
 if not myconfig.has_section('capture_2d'):
     myconfig.add_section('capture_2d')
@@ -82,6 +75,3 @@ if not myconfig.has_section('capture_2d'):
     save_config(myconfig)
 
 CAPTURE_2D = dict(myconfig.items('capture_2d'))
-
-
-#print("Zoom:", ZOOM)

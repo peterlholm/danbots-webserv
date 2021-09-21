@@ -7,15 +7,13 @@ from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
 from hw.led_control import set_dias
 
-if platform == "nt":
-    from pygame.image import save_extended
-
 def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
     if platform == "linux":
         fd1 = BytesIO()
         camera.capture(fd1, format=format, quality=quality)
         fd1.truncate()
         fd1.seek(0)
+        print("getimg", camera.zoom)
         camera.close()
         return fd1
     # windows
@@ -69,7 +67,7 @@ def u_picture():
     
     print("Dias:", dias)
     if dias:
-         set_dias(1)
+        set_dias(1)
     else:
         set_dias(0)
         print("set dias 0")

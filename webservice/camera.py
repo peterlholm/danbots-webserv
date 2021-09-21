@@ -4,12 +4,17 @@ from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, W
 
 # python: disable=unresolved-import,import-error
 
-if platform == "linux":
-    from picamera import PiCamera   # pylint: disable=import-error
-# else:
-#     import pygame
-#     import pygame.camera # pylint: disable=wrong-import-position
-#     #from pygame.locals import *
+
+from picamera import PiCamera   # pylint: disable=import-error
+
+def myzoom(val):
+    print ("myzoom", val)
+    d =1-val
+    print(d)
+    res = (d/2,d/2,1-d,1-d)
+    print(res)
+    return res
+    
 
 class CameraSettings:   # pylint: disable=too-many-instance-attributes
     camera = None
@@ -25,6 +30,8 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
     drc_strength = 'off'
     resolution = 'VGA'
     shutter_speed = 0
+    zoom = ZOOM
+    print ("zoom", zoom)
 
     def __init__(self, camera):
         self.camera = camera
@@ -44,8 +51,12 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.camera.drc_strength = self.drc_strength
         self.camera.resolution = self.resolution
         self.camera.shutter_speed = self.shutter_speed
+        print ("set", self.zoom)
+        myzoom(self.zoom)
+        #self.camera.zoom = (1.0-self.zoom, 1.0-self.zoom, self.zoom, self.zoom)
 
     def reset(self):
+        print ("resetting")
         self.camera.contrast = 0
         self.camera.brightness = 50
         self.camera.saturation = 0
@@ -58,6 +69,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.drc_strength = 'off'
         self.resolution = 'VGA'
         self.shutter_speed = 0
+        self.zoom = 1
 
     def str(self):
         return "Contrast: {} Brigthness: {} Saturation: {} Iso: {} Exposure Compensation: {} ".format(
@@ -67,24 +79,19 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         return "Contrast: {} Brigthness: {} Saturation: {}".format(self.contrast, self.brightness, self.saturation)
 
 def init_camera():
-    if platform=="linux":
-        camera = PiCamera(resolution='HD')
-        camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
-        camera.resolution = (WIDTH, HEIGHT)
-        # camera.resolution =(1280,720)
-        #camera.resolution =(2592,1944)
-        #camera.resolution =(640,480)
-        #camera.resolution =(160,160)
-        #print(camera.zoom)
-        if not camera.zoom:
-            camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
-        #camera.meter_mode = 'spot' # average spot backlit matrix
-        #camera.zoom = (0.15,0.15,0.9,0.9)
-        #print (camera.zoom)
-    # else:
-    #     pygame.camera.init()
-    #     camera = pygame.camera.Camera(0,(640,480))
-    #     camera.start()
+    camera = PiCamera(resolution='HD')
+    camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
+    camera.resolution = (WIDTH, HEIGHT)
+    #camera.resolution =(2592,1944)(1280,720)(640,480)(160,160)
+
+    print("init zoom",camera.zoom)
+    val = (0.15,0.15,0.7,0.70)
+    camera.zoom=val
+
+    myzoom(ZOOM)
+    #camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
+    print (camera.zoom)
+    #camera.meter_mode = 'spot' # average spot backlit matrix
     return camera
 
 def warm_up(camera):
