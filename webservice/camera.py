@@ -85,8 +85,8 @@ def init_camera():
     #camera.resolution =(2592,1944)(1280,720)(640,480)(160,160)
 
     print("init zoom",camera.zoom)
-    val = (0.15,0.15,0.7,0.70)
-    camera.zoom=val
+    #val = (0.15,0.15,0.7,0.70)
+    #camera.zoom=val
 
     myzoom(ZOOM)
     #camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
