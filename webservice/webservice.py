@@ -1,12 +1,12 @@
 #import os
 from flask import Flask, render_template #, request, session, redirect
-from version import VERSION, INSTALLED
+from version import VERSION
 from picture import pic
 from pic_2d import pic2d
 from pic_3d import pic3d
 from calibrate.calibrate import calibrate
 
-print("Loading Webservice " + VERSION + " installed: " + INSTALLED)
+print("Loading Webservice " + VERSION)
 app = Flask(__name__)
 app.debug = True
 app.register_blueprint(pic)
@@ -21,10 +21,10 @@ def home1():
 
 @app.route('/version')
 def version():
-    return "Webservice " + VERSION + " installed: " + INSTALLED
+    return "Webservice " + VERSION
 
 if __name__ == '__main__':
-    print("script server running version "+ VERSION + " installed: " + INSTALLED)
+    print("script server running version "+ VERSION)
     #app = Flask(__name__)
     app.debug = False
     app.env='development'

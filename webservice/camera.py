@@ -8,11 +8,11 @@ from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, W
 from picamera import PiCamera   # pylint: disable=import-error
 
 def myzoom(val):
-    print ("myzoom", val)
+    #print ("myzoom", val)
     d =1-val
-    print(d)
+    #print(d)
     res = (d/2,d/2,1-d,1-d)
-    print(res)
+    #print(res)
     return res
     
 
@@ -31,7 +31,6 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
     resolution = 'VGA'
     shutter_speed = 0
     zoom = ZOOM
-    print ("zoom", zoom)
 
     def __init__(self, camera):
         self.camera = camera
@@ -51,8 +50,8 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.camera.drc_strength = self.drc_strength
         self.camera.resolution = self.resolution
         self.camera.shutter_speed = self.shutter_speed
-        print ("set", self.zoom)
-        myzoom(self.zoom)
+        #print ("set", self.zoom)
+        #myzoom(self.zoom)
         #self.camera.zoom = (1.0-self.zoom, 1.0-self.zoom, self.zoom, self.zoom)
 
     def reset(self):
@@ -83,14 +82,8 @@ def init_camera():
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
     #camera.resolution =(2592,1944)(1280,720)(640,480)(160,160)
-
-    print("init zoom",camera.zoom)
-    #val = (0.15,0.15,0.7,0.70)
-    #camera.zoom=val
-
-    myzoom(ZOOM)
-    #camera.zoom = (1.0-ZOOM, 1.0-ZOOM, ZOOM, ZOOM)
-    print (camera.zoom)
+    camera.zoom = myzoom(ZOOM)
+    #print (camera.zoom)
     #camera.meter_mode = 'spot' # average spot backlit matrix
     return camera
 

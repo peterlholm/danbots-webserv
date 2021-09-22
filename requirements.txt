@@ -1,11 +1,9 @@
 requests
 flask
+
+pylint
+
 picamera
 gpiozero
 pigpio
 smbus
-
-#pylint
-
-
-
