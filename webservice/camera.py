@@ -1,20 +1,19 @@
-from sys import platform
+#from sys import platform
 from time import sleep
 from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
 # python: disable=unresolved-import,import-error
-
-
 from picamera import PiCamera   # pylint: disable=import-error
+
+_DEBUG = False
 
 def myzoom(val):
     #print ("myzoom", val)
-    d =1-val
+    dif =1-val
     #print(d)
-    res = (d/2,d/2,1-d,1-d)
+    res = (dif/2,dif/2,1-dif,1-dif)
     #print(res)
     return res
-    
 
 class CameraSettings:   # pylint: disable=too-many-instance-attributes
     camera = None
@@ -71,11 +70,12 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.zoom = 1
 
     def str(self):
-        return "Contrast: {} Brigthness: {} Saturation: {} Iso: {} Exposure Compensation: {} ".format(
-            self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso, self.exposure_compensation)
+        # return "Contrast: {} Brigthness: {} Saturation: {} Iso: {} Exposure Compensation: {} ".format(
+        #     self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso, self.exposure_compensation)
+        return f"Contrast: {self.camera.contrast} Brigthness: {self.camera.brightness} Saturation: {self.camera.saturation} Iso: {self.camera.iso} Exposure Compensation: {self.exposure_compensation}"
 
     def set_str(self):
-        return "Contrast: {} Brigthness: {} Saturation: {}".format(self.contrast, self.brightness, self.saturation)
+        return "Contrast: {self.contrast} Brigthness: {self.brightness} Saturation: {self.saturation}"
 
 def init_camera():
     camera = PiCamera(resolution='HD')
@@ -87,20 +87,21 @@ def init_camera():
     #camera.meter_mode = 'spot' # average spot backlit matrix
     return camera
 
-def warm_up(camera):
+def warm_up():
     sleep(WARMUP_TIME)
 
 def fix_exposure(mycamera):
-    # fix the current iso, shutter, gain.. setting
+    # fix the current iso, shutter, gain but NOT awb setting
     #mycamera.iso = 800
-    #warm_up(mycamera)
-    print ("Fixint at", get_exposure_info(mycamera))
+    if _DEBUG:
+        print ("Fixing exposure at", get_exposure_info(mycamera))
     mycamera.shutter_speed = mycamera.exposure_speed
     mycamera.exposure_mode = 'off'
-    g = mycamera.awb_gains
+    #g = mycamera.awb_gains
     #mycamera.awb_mode = 'off'
     #mycamera.awb_gains = g
-    print ("Fixed at", get_exposure_info(mycamera))
+    if _DEBUG:
+        print ("Fixed exposure at", get_exposure_info(mycamera))
 
 def auto_exposure(mycamera):
     mycamera.iso = 0
@@ -156,21 +157,24 @@ def get_exposure_info(camera):
     analog_gain = camera.analog_gain
     digital_gain = camera.digital_gain
     strg = ""
+    # if exposure_speed:
+    #     strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec) ".format(exposure_speed/1000000, 1000000/exposure_speed)
+    # strg += "Gain: Analog: {} Digital: {} = {:5.3f} ".format(
+    #     analog_gain, digital_gain, float(analog_gain * digital_gain))
     if exposure_speed:
-        strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec) ".format(exposure_speed/1000000, 1000000/exposure_speed)
-    strg += "Gain: Analog: {} Digital: {} = {:5.3f} ".format(
-        analog_gain, digital_gain, float(analog_gain * digital_gain))
+        strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec (~{1000000/exposure_speed:4.1f} pic/sec) "
+    strg += f"Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f} "
     return strg
 
 def get_white_balance(camera):
-    return "WhiteBalance: R: {:5.3f} B: {:5.3f}".format(float(camera.awb_gains[0]), float(camera.awb_gains[1]) )
+    return f"WhiteBalance: R: {float(camera.awb_gains[0]):5.3f} B: {float(camera.awb_gains[1]):5.3f}"
 
 def get_camera_settings(camera):
     #strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
-    strg = "ExposureSpeed: {:5.3f} sec\r\n".format(camera.exposure_speed/1000000)
+    strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec\r\n"
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"
-    strg += "Brightness {:5.3f} Contrast {:5.3f}\r\n".format(camera.brightness,camera.contrast)
-    strg += "Denoise {:5.3f} Sharpness {:5.3f}\r\n".format(camera.image_denoise, camera.sharpness)
+    strg += f"Brightness {camera.brightness:5.3f} Contrast {camera.contrast:5.3f}\r\n"
+    strg += f"Denoise {camera.image_denoise:5.3f} Sharpness {camera.sharpness:5.3f}\r\n"
     strg += "Mode: " + str(camera.sensor_mode) + " ISO: " + str(camera.iso) + "\r\n"
     strg += "FrameRate: " + str(camera.framerate) + "\r\n"
     strg += "FrameRateRange: " + str(camera.framerate_range) + "\r\n"
@@ -178,7 +182,7 @@ def get_camera_settings(camera):
     return strg
 
 def print_settings(camera):
-    strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)<br>".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
+    strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec(max {1000000/camera.exposure_speed:5.1f}  pic/sec)<br>"
     strg += "FrameRate: " + str(camera.framerate) + "<br>"
     strg += "FrameRateRange: " + str(camera.framerate_range) + "<br>"
     strg += "PictureSize: " + str(camera.resolution) + "<br>"

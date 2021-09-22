@@ -70,7 +70,7 @@ def u_picture():
     if quality:
         pic_quality=int(quality)
     get_set_led()
-    warm_up(camera)
+    warm_up()
     if _DEBUG:
         print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
@@ -79,7 +79,7 @@ def u_picture():
 def p_picture():
     arg = "?" + get_set_led()
     camera = init_camera()
-    warm_up(camera)
+    warm_up()
     exposure = get_exposure_info(camera)
     camera.close()
     return render_template('picture.html', name="", exposure=exposure, arg=arg)
@@ -94,7 +94,7 @@ def cam():
     get_set_led()
     camera = init_camera()
     #camera.resolution =(640,480)
-    warm_up(camera)
+    warm_up()
     if _DEBUG:
         print(get_exposure_info(camera))
     size = request.args.get('size', None)
@@ -109,7 +109,7 @@ def cam():
 def info():
     camera = init_camera()
     get_set_led()
-    warm_up(camera)
+    warm_up()
     camera_info = get_picture_info(camera)
     #pprint.pprint(camera_info)
     camera.close()
