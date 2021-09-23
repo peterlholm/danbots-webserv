@@ -59,7 +59,7 @@ def get_picture_set(camera):
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
-    sleep(CAPTURE_DELAY)
+    #sleep(CAPTURE_DELAY)
     if _DEBUG:
         print ("Dias", get_exposure_info(camera))
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
@@ -67,7 +67,7 @@ def get_picture_set(camera):
     fd2.seek(0)
     fix_exposure(camera)
     set_dias(False)
-    sleep(CAPTURE_DELAY)
+    #sleep(CAPTURE_DELAY)
     if _DEBUG:
         print ("Dark", get_exposure_info(camera))
     fd3 = BytesIO()
