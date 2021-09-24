@@ -67,13 +67,13 @@ def flash_led():
     mycamera.capture(calib_folder+'color.jpg', use_video_port=use_video_port)
     set_flash(1)
     sleep(setletime)
-    mycamera.capture(calib_folder+'flash.jpg', use_video_port=use_video_port)
+    mycamera.capture(calib_folder+'flash10.jpg', use_video_port=use_video_port)
     set_flash(0.1)
     sleep(setletime)
-    mycamera.capture(calib_folder+'flash10.jpg', use_video_port=use_video_port)
+    mycamera.capture(calib_folder+'flash01.jpg', use_video_port=use_video_port)
     set_flash(0.05)
     sleep(setletime)
-    mycamera.capture(calib_folder+'flash05.jpg', use_video_port=use_video_port)
+    mycamera.capture(calib_folder+'flash005.jpg', use_video_port=use_video_port)
     fix_exposure(mycamera)
     #dark
     set_flash(0)
@@ -83,8 +83,8 @@ def flash_led():
     mycamera.close()
 
     filelist = [calib_folder+'color.jpg',
-                calib_folder+'flash.jpg', calib_folder+'/tmp/calib/flash10.jpg',
-                calib_folder+'flash05.jpg', calib_folder+'nolight.jpg']
+                calib_folder+'flash10.jpg', calib_folder+'flash01.jpg',
+                calib_folder+'flash005.jpg', calib_folder+'nolight.jpg']
 
     param = {"cmd": "calflash"}
     res = send_files(filelist, post_data=param)
