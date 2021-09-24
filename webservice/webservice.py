@@ -5,6 +5,7 @@ from picture import pic
 from pic_2d import pic2d
 from pic_3d import pic3d
 from calibrate.calibrate import calibrate
+from calibrate.cal_flash import calibrate_flash
 
 print("Loading Webservice " + VERSION + " installed: " + INSTALLED)
 app = Flask(__name__)
