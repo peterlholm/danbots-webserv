@@ -8,7 +8,7 @@ from io import BytesIO
 from time import sleep
 #import base64
 import json
-from flask import Blueprint, render_template, request, Markup
+from flask import Blueprint #, render_template, request, Markup
 from picamera import PiCamera
 
 #from requests.api import post # Response, send_file,
@@ -16,7 +16,7 @@ from picamera import PiCamera
 #from camera import init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
 #from .camera import fix_exposure
 from hw.led_control import set_dias, set_flash #, get_dias, get_flash
-#from send2server import send_files
+from send2server import send_files
 
 # sensor modes
 # mode	Resolution 	Aspect 	Framerates 	    Video 	Image 	FoV 	Binning
@@ -28,7 +28,7 @@ from hw.led_control import set_dias, set_flash #, get_dias, get_flash
 # 6 	640x480 	4:3 	42 < fps <= 60 	    x 	    	Full 	4x4
 # 7 	640x480 	4:3 	60 < fps <= 90 	    x 	    	Full 	4x4
 
-calibrate_flash = Blueprint('calibrate', __name__, url_prefix='/calibrate')
+calibrate_flash = Blueprint('calibrate2', __name__, url_prefix='/calibrate')
 
 def capture_picture(mycamera):
     fd1 = BytesIO()
@@ -47,7 +47,7 @@ def fix_exposure(mycamera):
     #print ("Fixint at", get_exposure_info(mycamera))
     mycamera.shutter_speed = mycamera.exposure_speed
     mycamera.exposure_mode = 'off'
-    g = mycamera.awb_gains
+    #g = mycamera.awb_gains
     #mycamera.awb_mode = 'off'
     #mycamera.awb_gains = g
     #print ("Fixed at", get_exposure_info(mycamera))
@@ -60,7 +60,7 @@ def flash_led():
     calib_folder = "/tmp/flashcalib/"
     setletime = 5
     os.makedirs(calib_folder, exist_ok=True)
-    mycamera = PiCamera(sensor_mode=2)
+    mycamera = PiCamera(sensor_mode=2, resolution=(2592,1944))
     #camera.resolution =(640,480)
     #mycamera.resolution ='HD'
     sleep(setletime)
@@ -71,26 +71,24 @@ def flash_led():
     set_flash(0.1)
     sleep(setletime)
     mycamera.capture(calib_folder+'flash10.jpg', use_video_port=use_video_port)
-    set_flash(0.5)
+    set_flash(0.05)
     sleep(setletime)
     mycamera.capture(calib_folder+'flash05.jpg', use_video_port=use_video_port)
     fix_exposure(mycamera)
     #dark
     set_flash(0)
     sleep(setletime)
-    mycamera.capture(calib_folder+'nolight.png', use_video_port=use_video_port)
+    mycamera.capture(calib_folder+'nolight.jpg', use_video_port=use_video_port)
     #auto_exposure(mycamera)
     mycamera.close()
+
     filelist = [calib_folder+'color.jpg',
                 calib_folder+'flash.jpg', calib_folder+'/tmp/calib/flash10.jpg',
                 calib_folder+'flash05.jpg', calib_folder+'nolight.jpg']
-    
-    # param = {"cmd": "calibrate"}
-    # res = send_files(filelist, post_data=param)
-    # print (res)
-    # if res:
-    #     return res
-    # else:
-    #     print("det gik skidt")
-    return "alt gik godt"
 
+    param = {"cmd": "calflash"}
+    res = send_files(filelist, post_data=param)
+    print (res)
+    if res:
+        return res
+    return "alt gik godt"
