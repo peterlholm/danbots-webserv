@@ -62,7 +62,7 @@ def get_pictures(camera):
             sleep(0)
     finally:
         stop = datetime.now()
-        print("Vi lukker og slukker {:2.1f} Billeder/sek".format(i/((stop-start).total_seconds())))
+        print(f"Vi lukker og slukker {i/((stop-start).total_seconds()):2.1f} Billeder/sek")
         print(get_exposure_info(camera))
         camera.close()
         set_flash(False)
@@ -80,7 +80,7 @@ def cam():
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
-    warm_up(camera)
+    warm_up()
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic2d.route('/p_2d')
@@ -96,7 +96,7 @@ def picture():
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
-    warm_up(camera)
+    warm_up()
     fd = capture_picture(camera)
     expinfo=get_exposure_info(camera)
     camera.close()

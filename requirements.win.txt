@@ -1,10 +1,4 @@
 requests
 flask
-#picamera
 
-# debug
 pylint
-
-# win
-#pygame
-#videocapture

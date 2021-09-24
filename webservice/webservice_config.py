@@ -1,24 +1,29 @@
 #
 # read config and generate global coonstants
 #
-import os
+#import os
+from sys import platform
 import configparser
 
 MYDEBUG=False
 WINDOWS=False
 CONFIGFILE="/etc/danwand.conf"
 
+if platform=="win32":
+    print("windows")
+    CONFIGFILE = '..\\danwand.conf'
+
 if MYDEBUG:
     print ("Reading config file")
 
 def save_config(config):
-    with open(CONFIGFILE, 'w') as configfile:
+    with open(CONFIGFILE, 'w', encoding="UTF8") as configfile:
         config.write(configfile)
 
 # read config file
 
 myconfig = configparser.ConfigParser()
-myconfig.read_file(open(CONFIGFILE,'r'))
+myconfig.read_file(open(CONFIGFILE,'r', encoding="UTF8"))
 DEBUG=myconfig.getboolean('debug','debug',fallback=False)
 DEVICEID = myconfig.get('device','deviceid',fallback='11223344')
 
@@ -49,8 +54,6 @@ WARMUP_TIME = float(myconfig['camera'].get('warmup_time',1))
 HEIGHT = int(myconfig['camera'].get('height',160))
 WIDTH = int(myconfig['camera'].get('width',160))
 ZOOM = float(myconfig['camera'].get('zoom',1))
-
-print ("Z", ZOOM)
 
 if not myconfig.has_section('capture_3d'):
     myconfig.add_section('capture_3d')

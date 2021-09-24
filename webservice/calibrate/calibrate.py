@@ -5,9 +5,11 @@ import base64
 import json
 from flask import Blueprint, render_template, request, Markup
 #from requests.api import post # Response, send_file,
-from camera import init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
+from camera import get_picture_info, init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
 from hw.led_control import set_dias, set_flash, get_dias, get_flash
 from send2server import send_files
+
+_DEBUG = True
 
 calibrate = Blueprint('calibrate', __name__, url_prefix='/calibrate')
 
@@ -18,14 +20,14 @@ def capture_picture(mycamera):
     return fd1
 
 def write_picture_info( filename, info):
-    with open(filename, 'w') as outfile:
+    with open(filename, 'w', encoding="UTF8") as outfile:
         json.dump(info, outfile)
 
 @calibrate.route('/test', methods=['GET', 'POST'])
 def test():
     mycamera = init_camera()
     mycamera.resolution =(640,480)
-    warm_up(mycamera)
+    warm_up()
     settings = CameraSettings(mycamera)
     dias = None
     flash = None
@@ -56,7 +58,7 @@ def test():
         set_flash(True)
     if dias:
         set_dias(True)
-    warm_up(mycamera)
+    warm_up()
     fd2 = capture_picture(mycamera)
     exposure2 = Markup(get_exposure_info(mycamera)+ "<br>" + get_white_balance(mycamera) + " " + mysettings)
     img2 = base64.b64encode(fd2.getvalue()).decode()
@@ -79,23 +81,26 @@ def light():
 
 @calibrate.route('/camera', methods=['GET', 'POST'])
 def camera():
-    sleeptime = 1
+    sleeptime = 2
     os.makedirs("/tmp/calib", exist_ok=True)
     mycamera = init_camera()
     #camera.resolution =(640,480)
     mycamera.resolution ='HD'
     set_dias(0)
     set_flash(0)
-    warm_up(mycamera)
+    warm_up()
     #normal
     mycamera.capture('/tmp/calib/color.png', use_video_port=False)
-    #print(get_picture_info_json(mycamera))
+    if _DEBUG:
+        print("Color", get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/color.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/color.json", get_picture_info_json(mycamera))
     #dias
     set_dias(1)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/dias.png', use_video_port=False)
+    if _DEBUG:
+        print("Dias:",get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/dias.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/dias.json", get_picture_info_json(mycamera))
     #full flash
@@ -103,6 +108,8 @@ def camera():
     set_flash(1)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/flash.png', use_video_port=False)
+    if _DEBUG:
+        print("Flash",get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/flash.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/flash.json", get_picture_info_json(mycamera))
     fix_exposure(mycamera)
@@ -110,6 +117,8 @@ def camera():
     set_flash(0)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/nolight.png', use_video_port=False)
+    if _DEBUG:
+        print("NoLight", get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/nolight.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/nolight.json", get_picture_info_json(mycamera))
     auto_exposure(mycamera)
@@ -118,12 +127,16 @@ def camera():
     set_flash(0.1)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/flash01.png', use_video_port=False)
+    if _DEBUG:
+        print("Flash01", get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/flash01.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/flash01.json", get_picture_info_json(mycamera))
     fix_exposure(mycamera)
     set_flash(0)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/nolight01.png', use_video_port=False)
+    if _DEBUG:
+        print("NoLight01", get_exposure_info(mycamera))
     mycamera.capture('/tmp/calib/nolight01.jpg', use_video_port=False)
     write_picture_info("/tmp/calib/nolight01.json", get_picture_info_json(mycamera))
     auto_exposure(mycamera)
@@ -141,6 +154,6 @@ def camera():
     print (res)
     if res:
         return res
-    else:
-        print("det gik skidt")
+
+    print("det gik skidt")
     return "alt gik godt"
