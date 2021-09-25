@@ -1,3 +1,7 @@
+"""
+send2server
+send a set of files to server including command cmd
+"""
 #
 # send request to server
 #
@@ -10,8 +14,8 @@ from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
 SENDFILES = "sendfiles"
 
-HTTP_TIMEOUT=5
-_DEBUG=False
+HTTP_TIMEOUT=120
+_DEBUG=True
 
 def send_api_request(function, post_data=None, url=API_SERVER):
     params = {"deviceid": DEVICEID}
@@ -57,8 +61,6 @@ def post_file_object(function, fileobj, post_data=None, url=COMPUTE_SERVER):
     print(req.text)
     return False
 
-
-
 def post_file_objects(function, name_object_list, params=None,url=COMPUTE_SERVER):
     url_req = url + function
     file_spec = []
@@ -71,7 +73,7 @@ def post_file_objects(function, name_object_list, params=None,url=COMPUTE_SERVER
         print(req)
     return req
 
-def send_files (files, post_data=None, url=COMPUTE_SERVER):
+def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT):
     """ Send a bunch of file to the server
     :param files: filesname(s) as a sting or a list of strings
     :param post_data: dict send as POST content
@@ -86,7 +88,7 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER):
     files_spec=[]
     for myfile in files:
         filename = os.path.basename(myfile)
-        files_spec.append(('files', (filename, open(myfile,'rb'))))
+        files_spec.append(('files', (filename, open(myfile,'rb'))))     # pylint: disable=consider-using-with
 
     params = {"deviceid": DEVICEID}
     if post_data:
@@ -96,7 +98,7 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER):
         print('Data', data_spec)
         print ("filespec", files_spec)
     try:
-        req = requests.post(apiurl, timeout=HTTP_TIMEOUT, files=files_spec, data=params)
+        req = requests.post(apiurl, timeout=timeout, files=files_spec, data=params)
     except requests.exceptions.RequestException as ex:
         print(ex)
         return False
