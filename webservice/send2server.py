@@ -15,7 +15,7 @@ from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 SENDFILES = "sendfiles"
 
 HTTP_TIMEOUT=120
-_DEBUG=True
+_DEBUG=False
 
 def send_api_request(function, post_data=None, url=API_SERVER):
     params = {"deviceid": DEVICEID}
@@ -107,7 +107,7 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT)
         if _DEBUG:
             print('det gik godt')
             print(req.text)
-        print (req.json())
+            print (req.json())
         return req.json()
 
     print('Noget gik galt: ', req.status_code)
