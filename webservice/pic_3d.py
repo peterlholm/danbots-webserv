@@ -1,3 +1,6 @@
+"""
+Module for management of 3d scans
+"""
 from datetime import datetime
 from io import BytesIO
 from time import sleep
@@ -75,7 +78,7 @@ def get_picture_set(camera):
     fd3.truncate()
     fd3.seek(0)
     auto_exposure(camera)
-    set_flash(FLASH_LEVEL)
+    #set_flash(FLASH_LEVEL)
     return (fd2, fd3)
 
 def get_pictures(camera):
@@ -104,8 +107,9 @@ def get_pictures(camera):
                 pic_no = pic_no+1
                 if pic_no>NUMBER_PICTURES:
                     break
+                set_flash(FLASH_LEVEL)
             i=i+1
-            sleep(0)
+            #sleep(0)
     finally:
         stop = datetime.now()
         if _DEBUG:
@@ -158,6 +162,8 @@ pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 @pic3d.route('/3d')
 def cam():
     # send 3d set to compute
+    num = request.args.get('number')
+    print(num)
     send_start()
     camera = init_camera()
     camera.resolution =(160,160)
