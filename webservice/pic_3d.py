@@ -8,7 +8,7 @@ from flask import Blueprint, Response, request
 from camera import auto_exposure, fix_exposure, get_exposure_info, init_camera, warm_up, CameraSettings #, get_camera_settings
 from send_files import send_mem_files, save_mem_files, send_start, send_stop, send_file_objects #, send_mem_files_bg
 from hw.led_control import set_flash, set_dias
-from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, myconfig
+from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, DEVICEID, myconfig
 # python: disable=unresolved-import,import-error
 
 _DEBUG = myconfig.getboolean('capture_3d','debug',fallback=False)
@@ -158,6 +158,35 @@ def get_dias(camera, number_pictures=None):
         send_stop()
 
 pic3d = Blueprint('3d', __name__, url_prefix='/3d')
+
+
+@pic3d.route('/3dp')
+def camp():
+    # send 3d set to compute - without display
+    #num = request.args.get('number')
+    send_start()
+    camera = init_camera()
+    camera.resolution =(160,160)
+    #camera.framerate_range =(10,10)
+    cam_settings = CameraSettings(camera)
+    init_3d_camera(cam_settings)
+    size = request.args.get('size', None)
+    if size:
+        camera.resolution =(int(size),int(size))
+    set_dias(False)
+    set_flash(FLASH_LEVEL)
+    warm_up()
+    fd1 = BytesIO()
+    camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
+    fd1.truncate()
+    fd1.seek(0)
+    (fd2, fd3) = get_picture_set(camera)
+    send_picture([fd1,fd2,fd3], 1)
+    camera.close()
+    led_off()
+    send_stop()
+    res = { "device": DEVICEID }
+    return res
 
 @pic3d.route('/3d')
 def cam():
