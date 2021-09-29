@@ -61,7 +61,7 @@ def flash_led():
     use_video_port = True
     set_dias(0)
     set_flash(0)
-    rmtree(CALIB_FOLDER)
+    rmtree(CALIB_FOLDER, ignore_errors=True)
     os.makedirs(CALIB_FOLDER, exist_ok=True, mode=0o777)
     mycamera = PiCamera(sensor_mode=2, resolution=(2592,1944))
     #mycamera = PiCamera(sensor_mode=2, resolution=(1296,972))
