@@ -39,8 +39,8 @@ def send_api_request_bg (function, post_data=None, url=API_SERVER):
     th1 = threading.Thread(target=send_api_request, args=(function, post_data, url))
     th1.start()
 
-def post_file_object(function, fileobj, post_data=None, url=COMPUTE_SERVER):
-    url_req = url + function
+def post_file_object(api_request, fileobj, post_data=None, url=COMPUTE_SERVER):
+    url_req = url + api_request
     file_spec = []
 
     params = {"deviceid": DEVICEID}
@@ -61,8 +61,11 @@ def post_file_object(function, fileobj, post_data=None, url=COMPUTE_SERVER):
     print(req.text)
     return False
 
-def post_file_objects(function, name_object_list, params=None,url=COMPUTE_SERVER):
-    url_req = url + function
+def post_file_objects(api_request, name_object_list, params=None,url=COMPUTE_SERVER):
+    """
+    Send a list of file objects (filename, fd)
+    """
+    url_req = url + api_request
     file_spec = []
     for f in name_object_list:
         file_spec.append(('files', f))
@@ -74,7 +77,7 @@ def post_file_objects(function, name_object_list, params=None,url=COMPUTE_SERVER
     return req
 
 def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT):
-    """ Send a bunch of file to the server
+    """ Send a bunch of files to the server
     :param files: filesname(s) as a sting or a list of strings
     :param post_data: dict send as POST content
     :return: Result of operations
@@ -93,10 +96,8 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT)
     params = {"deviceid": DEVICEID}
     if post_data:
         params.update(post_data)
-
     if _DEBUG:
-        print('Data', data_spec)
-        print ("filespec", files_spec)
+        print('Data', data_spec, "filespec", files_spec)
     try:
         req = requests.post(apiurl, timeout=timeout, files=files_spec, data=params)
     except requests.exceptions.RequestException as ex:
@@ -105,13 +106,9 @@ def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT)
 
     if req.status_code == requests.codes.ok:  #pylint: disable=no-member
         if _DEBUG:
-            print('det gik godt')
-            print(req.text)
-            print (req.json())
+            print('det gik godt', req.text, req.json())
         return req.json()
-
-    print('Noget gik galt: ', req.status_code)
-    print(req.text)
+    print('Noget gik galt: ', req.status_code, req.text)
     return False
 
 if __name__ == '__main__':
