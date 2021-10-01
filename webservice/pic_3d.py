@@ -9,7 +9,6 @@ from camera import auto_exposure, fix_exposure, get_exposure_info, init_camera, 
 from send_files import send_mem_files, save_mem_files, send_start, send_stop, send_file_objects #, send_mem_files_bg
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, DEVICEID, myconfig
-# python: disable=unresolved-import,import-error
 
 _DEBUG = myconfig.getboolean('capture_3d','debug',fallback=False)
 
@@ -19,15 +18,14 @@ CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])      # delay to setle light m
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
 EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
-
 JPEG_QUALITY = 100
 
-def get_set_led():
-    dias = float(request.args.get('dias',0))
-    set_dias(dias)
-    flash = float(request.args.get('flash',0))
-    set_flash(flash)
-    return "dias="+str(dias) +"&flash="+str(flash)
+# def get_set_led():
+#     dias = float(request.args.get('dias',0))
+#     set_dias(dias)
+#     flash = float(request.args.get('flash',0))
+#     set_flash(flash)
+#     return "dias="+str(dias) +"&flash="+str(flash)
 
 def led_off():
     set_flash(0)
@@ -82,6 +80,7 @@ def get_picture_set(camera):
     return (fd2, fd3)
 
 def get_pictures(camera):
+    # return a picture for MPEG and send Captured Images to  compute server
     # used by /3d
     fd1 = BytesIO()
     i=1
@@ -157,8 +156,29 @@ def get_dias(camera, number_pictures=None):
         led_off()
         send_stop()
 
+# routes
+
 pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 
+@pic3d.route('/3d')
+def cam():
+    # send 3d set to compute
+    num = request.args.get('number')
+    print(num)
+    send_start()
+    camera = init_camera()
+    camera.resolution =(160,160)
+    camera.framerate_range =(10,10)
+    cam_settings = CameraSettings(camera)
+    init_3d_camera(cam_settings)
+    size = request.args.get('size', None)
+    if size:
+        camera.resolution =(int(size),int(size))
+    # start
+    set_dias(False)
+    set_flash(FLASH_LEVEL)
+    warm_up()
+    return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dp')
 def camp():
@@ -188,26 +208,6 @@ def camp():
     res = { "device": DEVICEID }
     return res
 
-@pic3d.route('/3d')
-def cam():
-    # send 3d set to compute
-    num = request.args.get('number')
-    print(num)
-    send_start()
-    camera = init_camera()
-    camera.resolution =(160,160)
-    camera.framerate_range =(10,10)
-    cam_settings = CameraSettings(camera)
-
-    init_3d_camera(cam_settings)
-
-    size = request.args.get('size', None)
-    if size:
-        camera.resolution =(int(size),int(size))
-    set_dias(False)
-    set_flash(FLASH_LEVEL)
-    warm_up()
-    return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dias')
 def cam3dias():

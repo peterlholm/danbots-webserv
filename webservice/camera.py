@@ -153,17 +153,11 @@ def get_picture_info_json(camera):
     return info
 
 def get_exposure_info(camera):
+    """Get the exposure info as string"""
     exposure_speed = camera.exposure_speed
     analog_gain = camera.analog_gain
     digital_gain = camera.digital_gain
-    strg = ""
-    # if exposure_speed:
-    #     strg = "ExposureSpeed: {:5.3f} sec (~{:4.1f} pic/sec) ".format(exposure_speed/1000000, 1000000/exposure_speed)
-    # strg += "Gain: Analog: {} Digital: {} = {:5.3f} ".format(
-    #     analog_gain, digital_gain, float(analog_gain * digital_gain))
-    if exposure_speed:
-        strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec (~{1000000/exposure_speed:4.1f} pic/sec) "
-    strg += f"Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f} "
+    strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
     return strg
 
 def get_white_balance(camera):

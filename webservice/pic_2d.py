@@ -1,3 +1,4 @@
+""" send 2d scans to server """
 from time import sleep
 from datetime import datetime
 from io import BytesIO
@@ -20,7 +21,6 @@ PICTURE_INTERVAL = float(CAPTURE_2D['picture_interval']) # delay between picture
 def send_picture(fd1, picture_no):
     filename = "picture"+str(picture_no)+'.jpg'
     send_file_object(fd1, filename, data={'cmd':'picture','folder': 'save2d', 'pictureinfo': picture_no}, url = API_SERVER + 'savefile')
-    #send_mem_files_bg(fd1, "picture"+str(i), params={'cmd':'picture','pictureinfo': "nr"}, info="djdjdjdj" )
 
 def capture_picture(camera):
     fd1 = BytesIO()
@@ -85,7 +85,7 @@ def cam():
 
 @pic2d.route('/p_2d')
 def p_cam():
-    return render_template('ppage.html', header="2D Cam", src="/2d/2d")
+    return render_template('p2page.html', header="2D Cam", src="/2d/2d")
 
 @pic2d.route('/picture')
 def picture():

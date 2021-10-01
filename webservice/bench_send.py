@@ -1,14 +1,15 @@
+"""benchmark for sending"""
 from datetime import datetime
-from copy import deepcopy 
+from copy import deepcopy
 from io import BytesIO, open
-from send_files import send_mem_files, send_mem_files_bg
+from send_files import send_mem_files #, send_mem_files_bg
 
-antal=20
+ANTAL=20
 start = datetime.now()
 with open('webservice.py', 'rb') as fh:
     myfd = BytesIO(fh.read())
 
-for i in range(antal):
+for i in range(ANTAL):
     # fd=BytesIO()
     # fd.write(myfd.getbuffer() )
     myfd.seek(0)
@@ -20,4 +21,4 @@ for i in range(antal):
 
 slut = datetime.now()
 
-print ("Transfers pr sek", antal/(slut-start).total_seconds())
+print ("Transfers pr sek", ANTAL/(slut-start).total_seconds())

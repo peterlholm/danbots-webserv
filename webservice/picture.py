@@ -1,4 +1,6 @@
-#from sys import platform
+"""
+Return pictures and MPEG images
+"""
 from datetime import datetime
 import pprint
 from fractions import Fraction
@@ -45,7 +47,6 @@ def scan_cont_pictures(camera):
     finally:
         stop = datetime.now()
         if _DEBUG:
-            #print("Vi lukker og slukker {:2.1f} billeder/sek".format(j/((stop-start).total_seconds())))
             print(f"Vi lukker og slukker {j/((stop-start).total_seconds()):.2f} billeder/sek")
             print(get_exposure_info(camera))
         camera.close()
@@ -93,7 +94,6 @@ def p_cam():
 def cam():
     get_set_led()
     camera = init_camera()
-    #camera.resolution =(640,480)
     warm_up()
     if _DEBUG:
         print(get_exposure_info(camera))
