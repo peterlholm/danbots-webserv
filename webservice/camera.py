@@ -1,3 +1,4 @@
+""" camera module for scanning """
 #from sys import platform
 from time import sleep
 from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
@@ -155,10 +156,18 @@ def get_picture_info_json(camera):
 def get_exposure_info(camera):
     """Get the exposure info as string"""
     exposure_speed = camera.exposure_speed
-    analog_gain = camera.analog_gain
-    digital_gain = camera.digital_gain
+    analog_gain = float(camera.analog_gain)
+    digital_gain = float(camera.digital_gain)
     strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
     return strg
+
+def get_exposure_info_dict(camera):
+    """Get the exposure info as string"""
+    exposure_speed = float(camera.exposure_speed)
+    analog_gain = float(camera.analog_gain)
+    digital_gain = float(camera.digital_gain)
+    exp = { "ExposureSpeed": exposure_speed/1000000, "AnalogGain": analog_gain, "DigitalGain": digital_gain, "TotalGain": analog_gain * digital_gain}
+    return exp
 
 def get_white_balance(camera):
     return f"WhiteBalance: R: {float(camera.awb_gains[0]):5.3f} B: {float(camera.awb_gains[1]):5.3f}"

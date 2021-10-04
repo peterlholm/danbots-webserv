@@ -1,4 +1,4 @@
-#import os
+"""scanner webservice"""
 from flask import Flask, render_template #, request, session, redirect
 from version import VERSION
 from picture import pic
@@ -27,7 +27,7 @@ def version():
     return "Webservice " + VERSION
 
 if __name__ == '__main__':
-    print("script server running version "+ VERSION)
+    print("Script server running version "+ VERSION)
     #app = Flask(__name__)
     app.debug = True
     app.env='development'

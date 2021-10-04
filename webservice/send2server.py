@@ -7,7 +7,7 @@ send a set of files to server including command cmd
 #
 import threading
 import os.path
-#import datetime
+from datetime import datetime
 #from io import BytesIO, open
 import requests
 from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
@@ -19,13 +19,14 @@ _DEBUG=False
 
 def send_api_request(function, post_data=None, url=API_SERVER):
     params = {"deviceid": DEVICEID}
-
     if post_data:
         params.update(post_data)
     try:
         url_req = url + function
-        print (params)
         req = requests.post(url_req, timeout=HTTP_TIMEOUT, data=params)
+    except requests.exceptions.ConnectionError as ex:
+        print(datetime.now(), "Connection Error", ex)
+        return False
     except requests.exceptions.RequestException as ex:
         print(ex)
         return False
@@ -42,12 +43,10 @@ def send_api_request_bg (function, post_data=None, url=API_SERVER):
 def post_file_object(api_request, fileobj, post_data=None, url=COMPUTE_SERVER):
     url_req = url + api_request
     file_spec = []
-
     params = {"deviceid": DEVICEID}
     if post_data:
         params.update(post_data)
-
-    file_spec = {'Picture': ("finavn.png", fileobj)}
+    file_spec = {'Picture': ("filnavn.png", fileobj)}
     try:
         req = requests.post(url_req, timeout=HTTP_TIMEOUT, files=file_spec, data=params)
     except requests.exceptions.RequestException as ex:
@@ -61,16 +60,19 @@ def post_file_object(api_request, fileobj, post_data=None, url=COMPUTE_SERVER):
     print(req.text)
     return False
 
-def post_file_objects(api_request, name_object_list, params=None,url=COMPUTE_SERVER):
+def post_file_objects(api_request, name_object_list, post_data=None,url=COMPUTE_SERVER):
     """
     Send a list of file objects (filename, fd)
     """
     url_req = url + api_request
+    params = {"deviceid": DEVICEID}
+    if post_data:
+        params.update(post_data)
     file_spec = []
     for f in name_object_list:
         file_spec.append(('files', f))
-    print(url_req)
-    print(params)
+    #print(url_req)
+    #print(params)
     req = requests.post(url_req, timeout=HTTP_TIMEOUT, files=file_spec, data=params)
     if not req:
         print(req)

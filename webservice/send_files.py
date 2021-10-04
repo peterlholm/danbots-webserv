@@ -69,8 +69,12 @@ def send_start():
     data_spec = {"deviceid": DEVICEID }
     try:
         req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
+    except requests.exceptions.ConnectionError as ex:
+        print(datetime.datetime.now(), "Cannot connect to server\n", ex)
+        return False
     except requests.exceptions.RequestException as ex:
         print(datetime.datetime.now(), ex)
+        print ("str", ex.errno, ex.filename, ex.filename2, ex.strerror, ex.args)
         return False
     if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
         print('Noget gik galt: ', req.status_code)
@@ -83,10 +87,10 @@ def send_stop():
     data_spec = {"deviceid": DEVICEID }
     try:
         req = requests.post(apiurl, timeout=HTTP_TIMEOUT, data=data_spec)
-    except requests.exceptions.RequestException as ex:
+    except requests.exceptions.ConnectionError as ex:
         print(datetime.datetime.now(), ex)
         return False
-    if not req.status_code == requests.codes.ok:  #pylint: disable=no-member
+    if not req.ok:
         print('Noget gik galt: ', req.status_code)
         print(req.text)
         return False

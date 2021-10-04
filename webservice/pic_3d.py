@@ -4,12 +4,15 @@ Module for management of 3d scans
 from datetime import datetime
 from io import BytesIO, StringIO
 from time import sleep
+import json
 from flask import Blueprint, Response, request
-from camera import auto_exposure, fix_exposure, get_exposure_info, get_picture_info_json, init_camera, warm_up, CameraSettings
-from send2server import post_file_object, post_file_objects #, get_camera_settings
-from send_files import send_mem_files, save_mem_files, send_start, send_stop, send_file_objects #, send_mem_files_bg
+from camera import auto_exposure, fix_exposure, get_exposure_info, get_exposure_info_dict, init_camera, warm_up, CameraSettings
+from send2server import send_api_request, post_file_objects # , post_file_object, get_camera_settings
+from send_files import  send_mem_files, save_mem_files, send_file_objects #, send_mem_files_bg send_start, send_stop,API_START,
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, DEVICEID, myconfig
+from webservice_config import COMPUTE_SERVER
+
 
 _DEBUG = myconfig.getboolean('capture_3d','debug',fallback=False)
 
@@ -22,27 +25,26 @@ EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
 JPEG_QUALITY = 100
 TESTINFO = True     # send exposure info with images
 
-# def get_set_led():
-#     dias = float(request.args.get('dias',0))
-#     set_dias(dias)
-#     flash = float(request.args.get('flash',0))
-#     set_flash(flash)
-#     return "dias="+str(dias) +"&flash="+str(flash)
-
 def led_off():
     set_flash(0)
     set_dias(0)
 
 def init_3d_camera(settings):
-    #initialize for 3d capture
+    """ initialize for 3d capture """
     if _DEBUG:
-        print(CAPTURE_3D)
+        print("Cpture3d settings", CAPTURE_3D)
     settings.resolution=(WIDTH, HEIGHT)
     settings.exposure_compensation=EXPOSURE_COMPENSATION
     settings.set()
     if _DEBUG:
         print("Camera Settings:", settings.str())
     return settings
+
+def send_start():
+    return send_api_request("start3d", url=COMPUTE_SERVER)
+
+def send_stop():
+    return send_api_request("stop3d", url=COMPUTE_SERVER)
 
 def send_picture(fd1, i, info=None):
     # used by /3d
@@ -58,36 +60,37 @@ def send_dias(fd1, i, info=None):
 def get_picture_infoset(camera):
     # get picture and exposure info
     # used by /3d
-    if TESTINFO or _DEBUG:
-        flash_exp = get_exposure_info(camera)
+    if TESTINFO:
+        flash_exp = get_exposure_info_dict(camera)
     if _DEBUG:
-        print ("Flash", flash_exp)
+        print ("Flash", get_exposure_info(camera))
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
     sleep(CAPTURE_DELAY)
-    if TESTINFO or _DEBUG:
-        dias_exp = get_exposure_info(camera)
+    if TESTINFO:
+        dias_exp = get_exposure_info_dict(camera)
     if _DEBUG:
-        print ("Dias", dias_exp)
+        print ("Dias", get_exposure_info(camera))
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd2.truncate()
     fd2.seek(0)
     fix_exposure(camera)
     set_dias(False)
     sleep(CAPTURE_DELAY)
-    if TESTINFO or _DEBUG:
-        dark_exp = get_exposure_info(camera)
+    if TESTINFO:
+        dark_exp = get_exposure_info_dict(camera)
     if _DEBUG:
-        print ("Dark", dark_exp)
+        print ("Dark", get_exposure_info(camera))
     fd3 = BytesIO()
     camera.capture(fd3, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd3.truncate()
     fd3.seek(0)
     auto_exposure(camera)
-    #set_flash(FLASH_LEVEL)
     if TESTINFO:
-        fdinfo = StringIO(str(flash_exp)) 
+        info = { "color": flash_exp, "dias": dias_exp, "nolight": dark_exp }
+        #print(info)
+        fdinfo = StringIO(json.dumps(info, indent=4))
     fileobj = [ ("dias.jpg",fd2),("nolight.jpg", fd3),("pict_info.json", fdinfo)]
     return fileobj
 
@@ -98,7 +101,7 @@ def get_picture_set(camera):
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
-    #sleep(CAPTURE_DELAY)
+    sleep(CAPTURE_DELAY)
     if _DEBUG:
         print ("Dias", get_exposure_info(camera))
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
@@ -106,7 +109,7 @@ def get_picture_set(camera):
     fd2.seek(0)
     fix_exposure(camera)
     set_dias(False)
-    #sleep(CAPTURE_DELAY)
+    sleep(CAPTURE_DELAY)
     if _DEBUG:
         print ("Dark", get_exposure_info(camera))
     fd3 = BytesIO()
@@ -128,6 +131,8 @@ def get_pictures(camera):
         pic_modolu=1
     else:
         pic_modolu = int(PICTURE_INTERVAL*10)
+    if _DEBUG:
+        print("pic_modulo", pic_modolu)
     try:
         while True:
             camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
@@ -141,8 +146,11 @@ def get_pictures(camera):
                 # get exposure info
                 #color_info = get_picture_info_json(camera)
                 (fd2, fd3) = get_picture_set(camera)
+                set_flash(FLASH_LEVEL)               
+                send_picture([fd1,fd2,fd3], pic_no)
+                sleep(CAPTURE_DELAY)
                 fdlist = get_picture_infoset(camera)
-                print(fdlist)
+                #print(fdlist)
                 post_file_objects("sendfiles", fdlist)
                 #send_picture([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
@@ -206,8 +214,8 @@ pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 @pic3d.route('/3d')
 def cam():
     # send 3d set to compute
-    num = request.args.get('number')
-    print(num)
+    # num = request.args.get('number')
+    # print(num)
     send_start()
     camera = init_camera()
     camera.resolution =(160,160)
@@ -220,6 +228,7 @@ def cam():
     # start
     set_dias(False)
     set_flash(FLASH_LEVEL)
+    warm_up()
     warm_up()
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
@@ -250,27 +259,6 @@ def camp():
     send_stop()
     res = { "device": DEVICEID }
     return res
-
-@pic3d.route('/3d')
-def cam():
-    # send 3d set to compute
-    #num = request.args.get('number')
-    #print(num)
-    send_start()
-    camera = init_camera()
-    camera.resolution =(160,160)
-    camera.framerate_range =(10,10)
-    cam_settings = CameraSettings(camera)
-
-    init_3d_camera(cam_settings)
-
-    size = request.args.get('size', None)
-    if size:
-        camera.resolution =(int(size),int(size))
-    set_dias(False)
-    set_flash(FLASH_LEVEL)
-    warm_up()
-    return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dias')
 def cam3dias():
