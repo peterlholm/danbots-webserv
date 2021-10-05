@@ -146,12 +146,14 @@ def get_pictures(camera):
                 # get exposure info
                 #color_info = get_picture_info_json(camera)
                 (fd2, fd3) = get_picture_set(camera)
-                set_flash(FLASH_LEVEL)               
-                send_picture([fd1,fd2,fd3], pic_no)
+                set_flash(FLASH_LEVEL)
+                #send_picture([fd1,fd2,fd3], pic_no)
                 sleep(CAPTURE_DELAY)
                 fdlist = get_picture_infoset(camera)
-                #print(fdlist)
-                post_file_objects("sendfiles", fdlist)
+                fd1.seek(0)
+                fdlist.append(['color.jpg', fd1])
+                print(fdlist)
+                post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
                 #send_picture([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
@@ -216,7 +218,10 @@ def cam():
     # send 3d set to compute
     # num = request.args.get('number')
     # print(num)
-    send_start()
+
+    server_up = send_start()
+    if not server_up:
+        return '{"result": 0, "reason": "no connection to compute server"}'
     camera = init_camera()
     camera.resolution =(160,160)
     camera.framerate_range =(10,10)

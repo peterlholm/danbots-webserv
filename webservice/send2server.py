@@ -25,12 +25,13 @@ def send_api_request(function, post_data=None, url=API_SERVER):
         url_req = url + function
         req = requests.post(url_req, timeout=HTTP_TIMEOUT, data=params)
     except requests.exceptions.ConnectionError as ex:
-        print(datetime.now(), "Connection Error", ex)
+        print(datetime.now(), "Connection Error\n", ex)
+        print ("str", ex.errno, ex.filename, ex.filename2, ex.strerror, ex.args)
         return False
     except requests.exceptions.RequestException as ex:
-        print(ex)
+        print("Request exception", ex)
         return False
-    if not req.status_code == requests.codes.ok:    #pylint: disable=no-member
+    if not req.ok:
         print('Noget gik galt: ', req.status_code)
         print(req.text)
         return False
