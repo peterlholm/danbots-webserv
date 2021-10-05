@@ -14,7 +14,7 @@ from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 
 SENDFILES = "sendfiles"
 
-HTTP_TIMEOUT=120
+HTTP_TIMEOUT=60
 _DEBUG=False
 
 def send_api_request(function, post_data=None, url=API_SERVER):

@@ -145,16 +145,15 @@ def get_pictures(camera):
             if i % pic_modolu == 0:
                 # get exposure info
                 #color_info = get_picture_info_json(camera)
-                (fd2, fd3) = get_picture_set(camera)
-                set_flash(FLASH_LEVEL)
+                #(fd2, fd3) = get_picture_set(camera)
                 #send_picture([fd1,fd2,fd3], pic_no)
+                set_flash(FLASH_LEVEL)
                 sleep(CAPTURE_DELAY)
                 fdlist = get_picture_infoset(camera)
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
                 print(fdlist)
                 post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
-                #send_picture([fd1,fd2,fd3], pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
                 if pic_no>NUMBER_PICTURES:

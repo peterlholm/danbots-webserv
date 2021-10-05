@@ -1,3 +1,4 @@
+"""Module for collecting calibration informatin"""
 import os
 from io import BytesIO
 from time import sleep
@@ -5,7 +6,7 @@ import base64
 import json
 from flask import Blueprint, render_template, request, Markup
 #from requests.api import post # Response, send_file,
-from camera import get_picture_info, init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure
+from camera import get_camera_settings, init_camera, warm_up, CameraSettings, get_exposure_info, get_picture_info_json, get_white_balance, fix_exposure, auto_exposure #get_picture_info
 from hw.led_control import set_dias, set_flash, get_dias, get_flash
 from send2server import send_files
 
@@ -81,14 +82,14 @@ def light():
 
 @calibrate.route('/camera', methods=['GET', 'POST'])
 def camera():
-    sleeptime = 2
+    sleeptime = 1.5
     os.makedirs("/tmp/calib", exist_ok=True)
     mycamera = init_camera()
-    #camera.resolution =(640,480)
-    mycamera.resolution ='HD'
+    mycamera.resolution =(2592,1944)
     set_dias(0)
     set_flash(0)
     warm_up()
+    print(get_camera_settings(mycamera))
     #normal
     mycamera.capture('/tmp/calib/color.png', use_video_port=False)
     if _DEBUG:
@@ -135,25 +136,18 @@ def camera():
     set_flash(0)
     sleep(sleeptime)
     mycamera.capture('/tmp/calib/nolight01.png', use_video_port=False)
-    if _DEBUG:
-        print("NoLight01", get_exposure_info(mycamera))
-    mycamera.capture('/tmp/calib/nolight01.jpg', use_video_port=False)
-    write_picture_info("/tmp/calib/nolight01.json", get_picture_info_json(mycamera))
-    auto_exposure(mycamera)
     mycamera.close()
-    filelist = ['/tmp/calib/color.png',
-                '/tmp/calib/color.jpg', '/tmp/calib/color.json',
+    filelist = ['/tmp/calib/color.png', '/tmp/calib/color.jpg', '/tmp/calib/color.json',
                 '/tmp/calib/dias.png', '/tmp/calib/dias.jpg', '/tmp/calib/dias.json',
                 '/tmp/calib/flash.png', '/tmp/calib/flash.jpg', '/tmp/calib/flash.json',
                 '/tmp/calib/nolight.png', '/tmp/calib/nolight.jpg', '/tmp/calib/nolight.json',
                 '/tmp/calib/flash01.png', '/tmp/calib/flash01.jpg', '/tmp/calib/flash01.json',
-                '/tmp/calib/nolight01.png', '/tmp/calib/nolight01.jpg', '/tmp/calib/nolight01.json']
-
-    param = {"cmd": "calibrate"}
+                #'/tmp/calib/nolight01.png', '/tmp/calib/nolight01.jpg', '/tmp/calib/nolight01.json'
+                ]
+    param = {"cmd": "caldias"}
     res = send_files(filelist, post_data=param)
     print (res)
     if res:
         return res
-
     print("det gik skidt")
-    return "alt gik godt"
+    return '{ "result": "false"}'
