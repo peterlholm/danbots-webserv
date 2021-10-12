@@ -152,7 +152,7 @@ def get_pictures(camera):
                 fdlist = get_picture_infoset(camera)
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
-                print(fdlist)
+                #print(fdlist)
                 post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
                 fd1.seek(0)
                 pic_no = pic_no+1
