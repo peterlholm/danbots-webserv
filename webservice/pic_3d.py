@@ -7,7 +7,7 @@ from time import sleep
 import json
 from flask import Blueprint, Response, request
 from camera import auto_exposure, fix_exposure, get_exposure_info, get_exposure_info_dict, init_camera, warm_up, CameraSettings
-from send2server import send_api_request, post_file_objects # , post_file_object, get_camera_settings
+from send2server import send_api_request, post_file_objects, post_file_objects_bg # , post_file_object, get_camera_settings
 from send_files import  send_mem_files, save_mem_files, send_file_objects #, send_mem_files_bg send_start, send_stop,API_START,
 from hw.led_control import set_flash, set_dias
 from webservice_config import CAPTURE_3D, HEIGHT, WIDTH, DEVICEID, myconfig
@@ -143,24 +143,29 @@ def get_pictures(camera):
                 b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
             fd1.seek(0)
             if i % pic_modolu == 0:
-                # get exposure info
-                #color_info = get_picture_info_json(camera)
-                #(fd2, fd3) = get_picture_set(camera)
-                #send_picture([fd1,fd2,fd3], pic_no)
+                st = datetime.now() 
                 set_flash(FLASH_LEVEL)
-                sleep(CAPTURE_DELAY)
+                sleep(CAPTURE_DELAY)          
                 fdlist = get_picture_infoset(camera)
+                sto2 = datetime.now()
+                if _DEBUG:
+                    print ("Capturetime", sto2-st)
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
                 #print(fdlist)
-                post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
+                #start = datetime.now()
+                post_file_objects_bg("scan3d", fdlist, post_data={'pictureno': pic_no})
+                #stop = datetime.now()
+                #print ("tid", stop-start)
                 fd1.seek(0)
                 pic_no = pic_no+1
                 if pic_no>NUMBER_PICTURES:
                     break
                 set_flash(FLASH_LEVEL)
+                sto = datetime.now()
+                if _DEBUG:
+                    print ("Pictureset time", sto-st)
             i=i+1
-            #sleep(0)
     finally:
         stop = datetime.now()
         if _DEBUG:
