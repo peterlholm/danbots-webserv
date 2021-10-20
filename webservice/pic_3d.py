@@ -169,6 +169,55 @@ def get_pictures(camera):
         led_off()
         send_stop()
 
+def get_test_pictures(camera):
+    # return a picture for MPEG and send Captured Images to  compute server
+    # but changing exposure
+    fd1 = BytesIO()
+    i=1
+    pic_no = 1
+    compensation = -10
+    start = datetime.now()
+    if PICTURE_INTERVAL==0:
+        pic_modolu=1
+    else:
+        pic_modolu = int(PICTURE_INTERVAL*10)
+    if _DEBUG:
+        print("pic_modulo", pic_modolu)
+    try:
+        while True:
+            camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
+            fd1.truncate()
+            fd1.seek(0)
+            pic = fd1.read()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
+            fd1.seek(0)
+            if i % pic_modolu == 0:
+                set_flash(FLASH_LEVEL)
+                sleep(CAPTURE_DELAY)
+                fdlist = get_picture_infoset(camera)
+                fd1.seek(0)
+                fdlist.append(['color.jpg', fd1])
+                print(fdlist)
+                post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
+                fd1.seek(0)
+                pic_no = pic_no+1
+                compensation = compensation+1
+                camera.exposure_compensation = compensation
+                if pic_no>20:
+                    break
+                set_flash(FLASH_LEVEL)
+            i=i+1
+            #sleep(0)
+    finally:
+        stop = datetime.now()
+        if _DEBUG:
+            print(f"Closing: {i/((stop-start).total_seconds()):2.1f} Billeder/sek")
+        camera.close()
+        led_off()
+        send_stop()
+
+
 def get_dias(camera, number_pictures=None):
     # used by /3dias
     if not number_pictures:
@@ -233,8 +282,23 @@ def cam():
     set_dias(False)
     set_flash(FLASH_LEVEL)
     warm_up()
-    warm_up()
     return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@pic3d.route('/3dtest')
+def test():
+    server_up = send_start()
+    if not server_up:
+        return '{"result": 0, "reason": "no connection to compute server"}'
+    camera = init_camera()
+    camera.resolution =(160,160)
+    camera.framerate_range =(10,10)
+    cam_settings = CameraSettings(camera)
+    init_3d_camera(cam_settings)
+    # start
+    set_dias(False)
+    set_flash(FLASH_LEVEL)
+    warm_up()
+    return Response(get_test_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dp')
 def camp():
