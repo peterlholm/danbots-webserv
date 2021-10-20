@@ -18,6 +18,8 @@ PICTURE_INTERVAL = float(CAPTURE_2D['picture_interval']) # delay between picture
 #EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
 #JPEG_QUALITY = 100
 
+_DEBUG = True
+
 def send_picture(fd1, picture_no):
     filename = "picture"+str(picture_no)+'.jpg'
     send_file_object(fd1, filename, data={'cmd':'picture','folder': 'save2d', 'pictureinfo': picture_no}, url = API_SERVER + 'savefile')
@@ -33,13 +35,14 @@ def get_pictures(camera):
     fd1 = BytesIO()
     i=1
     pic_no = 1
-    sleep(CAPTURE_DELAY)
+    #sleep(CAPTURE_DELAY)
     start = datetime.now()
     if PICTURE_INTERVAL==0:
         pic_modolu=1
     else:
         pic_modolu = int(PICTURE_INTERVAL*10)
-    print("pic modolu", pic_modolu)
+    if _DEBUG:
+        print("pic modolu", pic_modolu)
     try:
         while True:
             camera.capture(fd1, format='jpeg', use_video_port=True)

@@ -79,6 +79,10 @@ def post_file_objects(api_request, name_object_list, post_data=None,url=COMPUTE_
         print(req)
     return req
 
+def post_file_objects_bg (api_request, name_object_list, post_data=None,url=COMPUTE_SERVER):
+    th1 = threading.Thread(target=post_file_objects, args=(api_request, name_object_list, post_data, url))
+    th1.start()
+
 def send_files (files, post_data=None, url=COMPUTE_SERVER, timeout=HTTP_TIMEOUT):
     """ Send a bunch of files to the server
     :param files: filesname(s) as a sting or a list of strings
