@@ -70,6 +70,12 @@ def u_picture():
     quality = request.args.get('quality', None)
     if quality:
         pic_quality=int(quality)
+    size = request.args.get('size', None)
+    if size:
+        camera.resolution = (int(size),int(size))
+    compensation = request.args.get('compensation', None)
+    if compensation:
+        camera.exposure_compensation = int(compensation)
     get_set_led()
     warm_up()
     if _DEBUG:
