@@ -284,6 +284,7 @@ def cam():
     if size:
         camera.resolution =(int(size),int(size))
     # start
+    camera.brightness = 50
     set_dias(False)
     set_flash(FLASH_LEVEL)
     warm_up()
