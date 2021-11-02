@@ -6,6 +6,8 @@ from pic_2d import pic2d
 from pic_3d import pic3d
 from calibrate.calibrate import calibrate
 from calibrate.camera_test import test
+from hw.led_control import set_dias, set_flash
+
 #from calibrate.cal_flash import calibrate_flash
 
 print("Loading Webservice " + VERSION)
@@ -18,6 +20,11 @@ app.register_blueprint(calibrate)
 #app.register_blueprint(calibrate_flash)
 
 app.secret_key = b'_5#y2xyzQ8z\n\xec]/'
+
+# initialization
+print("initializing LED")
+set_dias(0)
+set_flash(0)
 
 @app.route('/')
 def home1():

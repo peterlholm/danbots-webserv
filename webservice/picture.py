@@ -3,13 +3,13 @@ Return pictures and MPEG images
 """
 from datetime import datetime
 import pprint
-from fractions import Fraction
+#from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
 from hw.led_control import set_dias, set_flash
 
-_DEBUG = False
+_DEBUG = True
 
 def get_set_led():
     dias = float(request.args.get('dias',0))
@@ -31,12 +31,14 @@ def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefine
     led_off()
     return fd1
 
-def scan_cont_pictures(camera):
+def scan_cont_pictures(camera, quality=None):
+    if quality is None:
+        quality=85
     j = 1
     stream = BytesIO()
     start = datetime.now()
     try:
-        for i in camera.capture_continuous(stream, format='jpeg', use_video_port=True): # pylint: disable=unused-variable
+        for i in camera.capture_continuous(stream, format='jpeg', quality=quality, use_video_port=True): # pylint: disable=unused-variable
             j = j+1
             stream.truncate()
             stream.seek(0)
@@ -108,8 +110,12 @@ def cam():
         camera.resolution = (int(size),int(size))
     max_frame = request.args.get('maxframerate', None)
     if max_frame:
-        camera.framerate_range.high = Fraction(1, int(max_frame))
-    return Response(scan_cont_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+        myrange = camera.framerate_range
+        camera.framerate_range = (myrange.low, int(max_frame))
+    quality = request.args.get('quality', None)
+    if quality:
+        quality=int(quality)
+    return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic.route('/info')
 def info():
