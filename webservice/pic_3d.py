@@ -120,7 +120,7 @@ def get_picture_set(camera):
     #set_flash(FLASH_LEVEL)
     return (fd2, fd3)
 
-def get_pictures(camera):
+def get_pictures(camera, no_pictures=NUMBER_PICTURES):
     # return a picture for MPEG and send Captured Images to  compute server
     # used by /3d
     fd1 = BytesIO()
@@ -143,28 +143,24 @@ def get_pictures(camera):
                 b'Content-Type: image/jpeg\r\n\r\n' + pic + b'\r\n')
             fd1.seek(0)
             if i % pic_modolu == 0:
-                st = datetime.now() 
+                start = datetime.now()
                 set_flash(FLASH_LEVEL)
-                sleep(CAPTURE_DELAY)          
+                sleep(CAPTURE_DELAY)
                 fdlist = get_picture_infoset(camera)
                 sto2 = datetime.now()
                 if _DEBUG:
-                    print ("Capturetime", sto2-st)
+                    print ("Capturetime", sto2-start)
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
-                #print(fdlist)
-                #start = datetime.now()
                 post_file_objects_bg("scan3d", fdlist, post_data={'pictureno': pic_no})
-                #stop = datetime.now()
-                #print ("tid", stop-start)
                 fd1.seek(0)
                 pic_no = pic_no+1
-                if pic_no>NUMBER_PICTURES:
+                if pic_no>no_pictures:
                     break
                 set_flash(FLASH_LEVEL)
                 sto = datetime.now()
                 if _DEBUG:
-                    print ("Pictureset time", sto-st)
+                    print ("Pictureset time", sto-start)
             i=i+1
     finally:
         stop = datetime.now()
@@ -271,7 +267,7 @@ def cam():
     # send 3d set to compute
     # num = request.args.get('number')
     # print(num)
-
+    no_pictures = request.args.get('no_pictures', None)
     server_up = send_start()
     if not server_up:
         return '{"result": 0, "reason": "no connection to compute server"}'
@@ -288,7 +284,7 @@ def cam():
     set_dias(False)
     set_flash(FLASH_LEVEL)
     warm_up()
-    return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_pictures(camera, no_pictures=no_pictures),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dtest')
 def test():
