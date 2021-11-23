@@ -1,6 +1,10 @@
 import time
 import smbus
 
+###########################################
+#  NB  lowest value is 1/32
+###########################################
+
 class ncp5623:
     def __init__(self):
         self.DEVICE_ADDRESS = 0x38

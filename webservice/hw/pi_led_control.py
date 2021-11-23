@@ -20,8 +20,8 @@ class PiLedControll:
         else:
             myfactory = None
         self.dias_led = PWMLED(DIAS_LED_PIN, pin_factory=myfactory)
+        #self.flash_led = PWMLED(FLASH_LED_PIN, pin_factory=myfactory, frequency=50)
         self.flash_led = PWMLED(FLASH_LED_PIN, pin_factory=myfactory)
-
     def set_dias(self, value):
         if value:
             self.dias_led.value = value

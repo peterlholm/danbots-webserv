@@ -35,6 +35,7 @@ def init_3d_camera(settings):
         print("Cpture3d settings", CAPTURE_3D)
     settings.resolution=(WIDTH, HEIGHT)
     settings.exposure_compensation=EXPOSURE_COMPENSATION
+    #settings.drc_strength = 'low', 'high'
     settings.set()
     if _DEBUG:
         print("Camera Settings:", settings.str())
