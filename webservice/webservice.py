@@ -22,7 +22,9 @@ app.register_blueprint(calibrate)
 app.secret_key = b'_5#y2xyzQ8z\n\xec]/'
 
 # initialization
-print("initializing LED")
+print("Test LED")
+set_flash(1)
+set_dias(1)
 set_dias(0)
 set_flash(0)
 
