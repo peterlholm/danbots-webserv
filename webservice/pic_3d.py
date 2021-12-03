@@ -268,7 +268,7 @@ def cam():
     # send 3d set to compute
     # num = request.args.get('number')
     # print(num)
-    no_pictures = request.args.get('no_pictures', NUMBER_PICTURES)
+    no_pictures = request.args.get('no_pictures', NUMBER_PICTURES, type=int)
     server_up = send_start()
     if not server_up:
         return '{"result": 0, "reason": "no connection to compute server"}'

@@ -22,7 +22,7 @@ def save_config(config):
 
 # read config file
 
-myconfig = configparser.ConfigParser()
+myconfig = configparser.ConfigParser(strict=False)
 myconfig.read_file(open(CONFIGFILE,'r', encoding="UTF8"))
 DEBUG=myconfig.getboolean('debug','debug',fallback=False)
 DEVICEID = myconfig.get('device','deviceid',fallback='11223344')
