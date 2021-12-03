@@ -36,6 +36,7 @@ def init_3d_camera(settings):
     settings.resolution=(WIDTH, HEIGHT)
     settings.exposure_compensation=EXPOSURE_COMPENSATION
     #settings.drc_strength = 'low', 'high'
+    settings.awb_mode = 'flash'
     settings.set()
     if _DEBUG:
         print("Camera Settings:", settings.str())
@@ -281,7 +282,7 @@ def cam():
     if size:
         camera.resolution =(int(size),int(size))
     # start
-    camera.brightness = 50
+    #camera.brightness = 50
     set_dias(False)
     set_flash(FLASH_LEVEL)
     warm_up()
