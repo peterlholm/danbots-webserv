@@ -6,7 +6,7 @@ from io import BytesIO, StringIO
 from time import sleep, perf_counter
 import json
 from flask import Blueprint, Response, request
-from camera import auto_exposure, fix_exposure, get_exposure_info, get_exposure_info_dict, init_camera, warm_up, CameraSettings
+from camera import auto_exposure, fix_exposure, get_exposure_info, get_exposure_info_dict, init_camera, warm_up, CameraSettings, myzoom
 from send2server import send_api_request, post_file_objects, post_file_objects_bg # , post_file_object, get_camera_settings
 from send_files import  send_mem_files, save_mem_files, send_file_objects #, send_mem_files_bg send_start, send_stop,API_START,
 from hw.led_control import set_flash, set_dias
@@ -187,13 +187,16 @@ def get_pictures(camera, no_pictures=NUMBER_PICTURES, picture_interval=PICTURE_I
         led_off()
         send_stop()
 
-def get_test_pictures(camera):
+def get_test_pictures(camera, mode="comp"):
     # return a picture for MPEG and send Captured Images to  compute server
     # but changing exposure
     fd1 = BytesIO()
     i=1
     pic_no = 1
-    compensation = -10
+    if mode=="comp":
+        compensation = -15
+    if mode=="zoom":
+        zoom = 0.2
     start = datetime.now()
     if PICTURE_INTERVAL==0:
         pic_modolu=1
@@ -203,6 +206,7 @@ def get_test_pictures(camera):
         print("pic_modulo", pic_modolu)
     try:
         while True:
+            sleep(CAPTURE_DELAY)
             camera.capture(fd1, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
             fd1.truncate()
             fd1.seek(0)
@@ -216,12 +220,17 @@ def get_test_pictures(camera):
                 fdlist = get_picture_infoset(camera)
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
-                print(fdlist)
+                #print(fdlist)
                 post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
                 fd1.seek(0)
                 pic_no = pic_no+1
-                compensation = compensation+1
-                camera.exposure_compensation = compensation
+                if mode=='comp':
+                    compensation = compensation+1
+                    camera.exposure_compensation = compensation
+                if mode=='zoom':
+                    zoom = zoom + 0.05
+                    rec = myzoom(zoom)
+                    camera.zoom = rec
                 if pic_no>20:
                     break
                 set_flash(FLASH_LEVEL)
@@ -310,12 +319,14 @@ def test():
     camera.resolution =(160,160)
     camera.framerate_range =(10,10)
     cam_settings = CameraSettings(camera)
+    mode = ''
+    mode = request.args.get('mode', None)
     init_3d_camera(cam_settings)
     # start
     set_dias(False)
     set_flash(FLASH_LEVEL)
     warm_up()
-    return Response(get_test_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(get_test_pictures(camera, mode=mode),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic3d.route('/3dp')
 def camp():
