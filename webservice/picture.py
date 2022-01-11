@@ -28,10 +28,10 @@ def led_off():
 
 def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin  
     fd1 = take_picture()
-    camera.capture(fd1, format=format, quality=quality)
-    fd1.truncate()
-    fd1.seek(0)
-    camera.close()
+    # camera.capture(fd1, format=format, quality=quality)
+    # fd1.truncate()
+    # fd1.seek(0)
+    # camera.close()
     led_off()
     return fd1
 
@@ -61,7 +61,7 @@ def scan_cont_pictures(camera, quality=None):
 
 pic = Blueprint('pic', __name__, url_prefix='/pic')
 
-@pic.route('/picture')
+@pic.route('/xpicture')
 def u_picture():
     #?quality=85&dias=0&type=jpeg/png
     if False:
@@ -89,7 +89,7 @@ def u_picture():
     #     print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
-@pic.route('/lpicture')
+@pic.route('/picture')
 def l_picture():
     #?quality=85&dias=0&type=jpeg/png
     
