@@ -13,6 +13,11 @@ if platform=="win32":
     print("windows")
     CONFIGFILE = '..\\danwand.conf'
 
+with open ("/etc/debian_version", "r") as myfile:
+    DEBIAN_VERSION=myfile.readlines()
+
+print ("Debian version: " + DEBIAN_VERSION)
+
 if MYDEBUG:
     print ("Reading config file")
 
