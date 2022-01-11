@@ -2,7 +2,7 @@
 #from sys import platform
 from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
-from .webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
+from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
 # python: disable=unresolved-import,import-error
 

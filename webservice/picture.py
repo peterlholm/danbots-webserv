@@ -6,7 +6,10 @@ import pprint
 #from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
-from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
+if False:
+    from camera import init_camera, warm_up,  get_picture_info, get_exposure_info #get_camera_settings,
+else:
+    from libcamera import take_picture
 from hw.led_control import set_dias, set_flash
 
 _DEBUG = True
@@ -22,8 +25,9 @@ def led_off():
     set_flash(0)
     set_dias(0)
 
-def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
-    fd1 = BytesIO()
+
+def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin  
+    fd1 = take_picture()
     camera.capture(fd1, format=format, quality=quality)
     fd1.truncate()
     fd1.seek(0)
@@ -60,8 +64,37 @@ pic = Blueprint('pic', __name__, url_prefix='/pic')
 @pic.route('/picture')
 def u_picture():
     #?quality=85&dias=0&type=jpeg/png
-    camera = init_camera()
-    camera.resolution =(2592,1944)
+    if False:
+        camera = init_camera()
+        camera.resolution =(2592,1944)
+        pic_format='jpeg'
+        pic_mime='image/jpeg'
+        img_type = request.args.get('type', None)
+        if img_type=='png':
+            pic_format='png'
+            pic_mime='image/png'
+        pic_quality = 85
+        quality = request.args.get('quality', None)
+        if quality:
+            pic_quality=int(quality)
+        size = request.args.get('size', None)
+        if size:
+            camera.resolution = (int(size),int(size))
+        compensation = request.args.get('compensation', None)
+        if compensation:
+            camera.exposure_compensation = int(compensation)
+    get_set_led()
+    #warm_up()
+    # if _DEBUG:
+    #     print(get_exposure_info(camera))
+    return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
+
+@pic.route('/lpicture')
+def l_picture():
+    #?quality=85&dias=0&type=jpeg/png
+    
+    camera = None
+    #camera.resolution =(2592,1944)
     pic_format='jpeg'
     pic_mime='image/jpeg'
     img_type = request.args.get('type', None)
@@ -76,12 +109,9 @@ def u_picture():
     if size:
         camera.resolution = (int(size),int(size))
     compensation = request.args.get('compensation', None)
-    if compensation:
-        camera.exposure_compensation = int(compensation)
+    # if compensation:
+    #     camera.exposure_compensation = int(compensation)
     get_set_led()
-    warm_up()
-    if _DEBUG:
-        print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
 @pic.route('/p_picture')
