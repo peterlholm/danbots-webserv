@@ -16,7 +16,7 @@ if platform=="win32":
 with open ("/etc/debian_version", "r") as myfile:
     DEBIAN_VERSION=myfile.readlines()
 
-print ("Debian version: " + DEBIAN_VERSION)
+print ("Debian version: " + DEBIAN_VERSION[0])
 
 if MYDEBUG:
     print ("Reading config file")
