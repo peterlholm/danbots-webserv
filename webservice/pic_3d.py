@@ -24,7 +24,8 @@ NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
 EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
 JPEG_QUALITY = 100
-TESTINFO = False     # send exposure info with images
+
+TESTINFO = False    # send exposure info with images
 
 def led_off():
     set_flash(0)
@@ -61,21 +62,16 @@ def send_dias(fd1, i, info=None):
     save_mem_files(fd1, "picture"+str(i), params={'cmd':'picture','pictureno': str(i)}, info=info )
 
 def get_picture_infoset(camera):
-    # get picture and exposure info
-    # used by /3d
+    # get picture and exposure info used by /3d
     st1 = perf_counter()
     if TESTINFO:
         flash_exp = get_exposure_info_dict(camera)
-    if _DEBUG:
-        print ("Flash", get_exposure_info(camera))
     set_flash(False)
     set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
     sleep(CAPTURE_DELAY)
     if TESTINFO:
         dias_exp = get_exposure_info_dict(camera)
-    if _DEBUG:
-        print ("Dias", get_exposure_info(camera))
     camera.capture(fd2, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd2.truncate()
     fd2.seek(0)
@@ -84,8 +80,6 @@ def get_picture_infoset(camera):
     sleep(CAPTURE_DELAY)
     if TESTINFO:
         dark_exp = get_exposure_info_dict(camera)
-    if _DEBUG:
-        print ("Dark", get_exposure_info(camera))
     fd3 = BytesIO()
     camera.capture(fd3, format='jpeg', use_video_port=True, quality=JPEG_QUALITY)
     fd3.truncate()
@@ -93,7 +87,6 @@ def get_picture_infoset(camera):
     auto_exposure(camera)
     if TESTINFO:
         info = { "color": flash_exp, "dias": dias_exp, "nolight": dark_exp }
-        #print(info)
         fdinfo = StringIO(json.dumps(info, indent=4))
         fileobj = [ ("dias.jpg",fd2),("nolight.jpg", fd3),("pict_info.json", fdinfo)]
     else:
@@ -160,9 +153,10 @@ def get_pictures(camera, no_pictures=NUMBER_PICTURES, picture_interval=PICTURE_I
                 fdlist = get_picture_infoset(camera)
                 if _TIMING:
                     time_info = perf_counter()
-                    print(f" get_picture_infoset time {(time_info-time_start)}")
+                    print(f"Take pictures {(time_info-time_start)}")
                 fd1.seek(0)
                 fdlist.append(['color.jpg', fd1])
+                #post_file_objects("scan3d", fdlist, post_data={'pictureno': pic_no})
                 post_file_objects_bg("scan3d", fdlist, post_data={'pictureno': pic_no})
                 if _TIMING:
                     time_post = perf_counter()

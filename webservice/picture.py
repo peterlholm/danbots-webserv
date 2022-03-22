@@ -2,6 +2,7 @@
 Return pictures and MPEG images
 """
 from datetime import datetime
+#from time import perf_counter
 import pprint
 #from fractions import Fraction
 from io import BytesIO
@@ -12,17 +13,21 @@ from hw.led_control import set_dias, set_flash
 _DEBUG = True
 
 def get_set_led():
+    # 1.003 sec on slow connections
+    #start  = perf_counter()
     dias = float(request.args.get('dias',0))
     set_dias(dias)
     flash = float(request.args.get('flash',0))
     set_flash(flash)
+    #stop = perf_counter()
+    #print (f"GetSetLed {stop - start:.3f} seconds")
     return "dias="+str(dias) +"&flash="+str(flash)
 
 def led_off():
     set_flash(0)
     set_dias(0)
 
-def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin  
+def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
     fd1 = BytesIO()
     camera.capture(fd1, format=format, quality=quality)
     fd1.truncate()
@@ -107,7 +112,7 @@ def p_cam():
 def cam():
     get_set_led()
     camera = init_camera()
-    warm_up()
+    #warm_up()
     if _DEBUG:
         print(get_exposure_info(camera))
     size = request.args.get('size', None)

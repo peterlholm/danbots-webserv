@@ -24,7 +24,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
     iso = None
     exposure_compensation = 0
     exposure_mode = 'auto'
-    awb_mode = 'auto'
+    awb_mode = 'flash'
     sharpness = 0
     meter_mode = 'average'
     drc_strength = 'off'
@@ -62,7 +62,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.iso = None
         self.exposure_compensation = 0
         self.exposure_mode = 'auto'
-        self.awb_mode = 'auto'
+        self.awb_mode = 'flash'
         self.sharpness = 0
         self.meter_mode = 'average'
         self.drc_strength = 'off'
@@ -80,6 +80,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
 
 def init_camera():
     camera = PiCamera(resolution='HD')
+    camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
     #camera.resolution =(2592,1944)(1280,720)(640,480)(160,160)
