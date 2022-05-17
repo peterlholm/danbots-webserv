@@ -10,7 +10,7 @@ StartLimitIntervalSec=10
 [Service]
 Type=simple
 Restart=always
-RestartSec=10
+RestartSec=60
 User=danwand
 Environment=PYTHONUNBUFFERED=1
 StandardOutput=append:/var/log/webservice.log
