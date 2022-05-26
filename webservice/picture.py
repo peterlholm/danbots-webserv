@@ -1,5 +1,5 @@
 """
-Return pictures and MPEG images
+Return pictures and MPEG images with led control from URL
 """
 from datetime import datetime
 #from time import perf_counter
@@ -7,12 +7,13 @@ import pprint
 #from fractions import Fraction
 from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
-from camera import init_camera, warm_up,  get_picture_info, get_exposure_info, myzoom #get_camera_settings,
+from camera import init_camera, warm_up,  get_picture_info, get_exposure_info, myzoom # pylint: disable=line-too-long
 from hw.led_control import set_dias, set_flash
 
 _DEBUG = True
 
 def get_set_led():
+    "Decode led information from url"
     # 1.003 sec on slow connections
     #start  = perf_counter()
     dias = float(request.args.get('dias',0))
@@ -24,10 +25,12 @@ def get_set_led():
     return "dias="+str(dias) +"&flash="+str(flash)
 
 def led_off():
+    "Turn both leds off"
     set_flash(0)
     set_dias(0)
 
 def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
+    "Take picture and put in ByteIO stream"
     fd1 = BytesIO()
     camera.capture(fd1, format=format, quality=quality)
     fd1.truncate()
@@ -37,13 +40,14 @@ def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefine
     return fd1
 
 def scan_cont_pictures(camera, quality=None):
+    "Take continues pictures and return in yield"
     if quality is None:
         quality=85
     j = 1
     stream = BytesIO()
     start = datetime.now()
     try:
-        for i in camera.capture_continuous(stream, format='jpeg', quality=quality, use_video_port=True): # pylint: disable=unused-variable
+        for i in camera.capture_continuous(stream, format='jpeg', quality=quality, use_video_port=True): # pylint: disable=unused-variable,line-too-long
             j = j+1
             stream.truncate()
             stream.seek(0)
@@ -64,6 +68,7 @@ pic = Blueprint('pic', __name__, url_prefix='/pic')
 
 @pic.route('/picture')
 def u_picture():
+    "Take picture and return as jpeg image"
     #?quality=85&dias=0&type=jpeg/png
     camera = init_camera()
     camera.resolution =(2592,1944)
@@ -96,20 +101,24 @@ def u_picture():
 
 @pic.route('/p_picture')
 def p_picture():
+    "Take picture and return html page with picture and information"
     arg = "?" + get_set_led()
     camera = init_camera()
     warm_up()
-    exposure = get_exposure_info(camera)
+    #exposure = get_exposure_info(camera)
+    exposure = ""
     camera.close()
     return render_template('picture.html', name="", exposure=exposure, arg=arg)
 
 @pic.route('/p_cam')
 def p_cam():
+    "Start cam and return html page with mpeg stream and information"
     arg=get_set_led()
     return render_template('cam.html', name="", arg=arg)
 
 @pic.route('/cam')
 def cam():
+    "Start Cam and return mpeg stream"
     get_set_led()
     camera = init_camera()
     #warm_up()
@@ -125,10 +134,11 @@ def cam():
     quality = request.args.get('quality', None)
     if quality:
         quality=int(quality)
-    return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame') # pylint: disable=line-too-long
 
 @pic.route('/info')
 def info():
+    "get picture info without taking picture"
     camera = init_camera()
     get_set_led()
     warm_up()

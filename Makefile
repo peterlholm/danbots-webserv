@@ -27,7 +27,7 @@ apacheconf:	/var/www/webservice/apache/webservice.conf
 
 # io service
 pigpiod:
-	sudo apt install pigpiod
+	sudo apt -y install pigpiod
 	systemctl enable pigpiod.service
 	systemctl restart pigpiod.service
 

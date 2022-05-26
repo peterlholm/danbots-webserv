@@ -8,7 +8,7 @@ After=network.target
 StartLimitIntervalSec=10
 
 [Service]
-Type=simple
+Type=idle
 Restart=always
 RestartSec=60
 User=pi
