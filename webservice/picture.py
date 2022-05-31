@@ -31,7 +31,7 @@ def led_off():
     set_flash(0)
     set_dias(0)
 
-def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
+def get_picture(camera, format='jpeg', quality=DEFAULT_JPG_QUALITY): # pylint: disable=redefined-builtin
     "Take picture and put in ByteIO stream"
     fd1 = BytesIO()
     camera.capture(fd1, format=format, quality=quality)
@@ -134,6 +134,8 @@ def cam():
     quality = request.args.get('quality', None)
     if quality:
         quality=int(quality)
+    else:
+        quality = DEFAULT_JPG_QUALITY
     return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame') # pylint: disable=line-too-long
 
 @pic.route('/info')
