@@ -121,9 +121,6 @@ def cam():
     "Start Cam and return mpeg stream"
     get_set_led()
     camera = init_camera()
-    #warm_up()
-    if _DEBUG:
-        print(get_exposure_info(camera))
     size = request.args.get('size', None)
     if size:
         camera.resolution = (int(size),int(size))

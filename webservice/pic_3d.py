@@ -127,11 +127,12 @@ def get_picture_set(camera):
 
 def get_pictures(camera, no_pictures=NUMBER_PICTURES, picture_interval=PICTURE_INTERVAL):
     # return a picture for MPEG and send Captured Images to  compute server
+    # picture_interval is the interval of frames set to server ????
     # used by /3d
     fd1 = BytesIO()
     i=1
     pic_no = 1
-    start = datetime.now()
+    sstart = datetime.now()
     if picture_interval==0:
         pic_modolu=1
     else:
@@ -177,9 +178,9 @@ def get_pictures(camera, no_pictures=NUMBER_PICTURES, picture_interval=PICTURE_I
                     print(f"Loop time {(time_end-time_start)}")
             i=i+1
     finally:
-        stop = datetime.now()
+        sstop = datetime.now()
         if _DEBUG:
-            print(f"Closing: {i/((stop-start).total_seconds()):2.1f} Billeder/sek")
+            print(f"Closing: {i/((sstop-sstart).total_seconds()):2.1f} displayed pic/sec")
         camera.close()
         led_off()
         send_stop()
@@ -288,6 +289,8 @@ pic3d = Blueprint('3d', __name__, url_prefix='/3d')
 @pic3d.route('/3d')
 def cam():
     # send 3d set to compute
+    if _DEBUG:
+        print(request.args)
     no_pictures = request.args.get('no_pictures', NUMBER_PICTURES, type=int)
     picture_interval = request.args.get('picture_interval', PICTURE_INTERVAL, type=float)
     server_up = send_start()
