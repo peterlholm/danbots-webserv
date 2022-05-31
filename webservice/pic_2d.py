@@ -16,7 +16,7 @@ CAPTURE_DELAY = float(CAPTURE_2D['capture_delay'])      # delay to setle light m
 NUMBER_PICTURES = int(CAPTURE_2D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_2D['picture_interval']) # delay between pictures
 #EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
-#JPEG_QUALITY = 100
+#JPEG_QUALITY = 85
 
 _DEBUG = True
 

@@ -23,7 +23,7 @@ CAPTURE_DELAY = float(CAPTURE_3D['capture_delay'])      # delay to setle light m
 NUMBER_PICTURES = int(CAPTURE_3D['number_pictures'])
 PICTURE_INTERVAL = float(CAPTURE_3D['picture_interval']) # delay between pictures
 EXPOSURE_COMPENSATION = int(CAPTURE_3D['exposure_compensation'])
-JPEG_QUALITY = 100
+JPEG_QUALITY = 85
 
 TESTINFO = False    # send exposure info with images
 
@@ -63,11 +63,13 @@ def send_dias(fd1, i, info=None):
 
 def get_picture_infoset(camera):
     # get picture and exposure info used by /3d
+    LEDON = True
     st1 = perf_counter()
     if TESTINFO:
         flash_exp = get_exposure_info_dict(camera)
-    set_flash(False)
-    set_dias(DIAS_LEVEL)
+    if LEDON:
+        set_flash(False)
+        set_dias(DIAS_LEVEL)
     fd2 = BytesIO()
     sleep(CAPTURE_DELAY)
     if TESTINFO:
@@ -76,7 +78,8 @@ def get_picture_infoset(camera):
     fd2.truncate()
     fd2.seek(0)
     fix_exposure(camera)
-    set_dias(False)
+    if LEDON:
+        set_dias(False)
     sleep(CAPTURE_DELAY)
     if TESTINFO:
         dark_exp = get_exposure_info_dict(camera)

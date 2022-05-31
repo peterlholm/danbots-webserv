@@ -10,6 +10,8 @@ from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info, myzoom # pylint: disable=line-too-long
 from hw.led_control import set_dias, set_flash
 
+DEFAULT_JPG_QUALITY = 85
+
 _DEBUG = True
 
 def get_set_led():
@@ -39,10 +41,8 @@ def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefine
     led_off()
     return fd1
 
-def scan_cont_pictures(camera, quality=None):
+def scan_cont_pictures(camera, quality=DEFAULT_JPG_QUALITY):
     "Take continues pictures and return in yield"
-    if quality is None:
-        quality=85
     j = 1
     stream = BytesIO()
     start = datetime.now()
@@ -78,7 +78,7 @@ def u_picture():
     if img_type=='png':
         pic_format='png'
         pic_mime='image/png'
-    pic_quality = 85
+    pic_quality = DEFAULT_JPG_QUALITY
     quality = request.args.get('quality', None)
     if quality:
         pic_quality=int(quality)
