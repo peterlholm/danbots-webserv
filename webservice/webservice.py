@@ -1,12 +1,17 @@
-"""scanner webservice"""
+"scanner webservice"
+import signal
 from flask import Flask, render_template #, request, session, redirect
 from version import VERSION
 from picture import pic
 from pic_2d import pic2d
 from pic_3d import pic3d
 from calibrate.calibrate import calibrate
-from calibrate.camera_test import test
+#from calibrate.camera_test import test
 from hw.led_control import set_dias, set_flash
+
+def receive_signal(signal_number, frame):
+    "signal handling"
+    print(f'Received Signal: {signal_number} {frame}')
 
 #from calibrate.cal_flash import calibrate_flash
 
@@ -22,6 +27,10 @@ app.register_blueprint(calibrate)
 app.secret_key = b'_5#y2xyzQ8z\n\xec]/'
 
 # initialization
+print ("Starting Webservice")
+signal.signal(signal.SIGTERM, receive_signal)
+signal.signal(signal.SIGINT, receive_signal)
+
 print("Test LED")
 set_flash(1)
 set_dias(1)
@@ -30,10 +39,12 @@ set_flash(0)
 
 @app.route('/')
 def home1():
+    "testing can be deleted"
     return render_template('index.html')
 
 @app.route('/version')
 def version():
+    "version"
     return "Webservice " + VERSION
 
 if __name__ == '__main__':
