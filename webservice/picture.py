@@ -133,6 +133,8 @@ def cam():
         quality=int(quality)
     else:
         quality = DEFAULT_JPG_QUALITY
+    camera.iso = 100
+    
     return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame') # pylint: disable=line-too-long
 
 @pic.route('/info')

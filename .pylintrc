@@ -5,7 +5,7 @@
 
 [MESSAGES CONTROL]
 
-disable= line-too-long
+disable=line-too-long
         //missing-function-docstring,
         //missing-module-docstring,
         //missing-class-docstring,

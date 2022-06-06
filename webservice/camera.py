@@ -1,4 +1,6 @@
 """ camera module for scanning """
+import sys
+import os
 #from sys import platform
 from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
@@ -80,7 +82,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         # Exposure Compensation: {} ".format(
         #     self.camera.contrast, self.camera.brightness, self.camera.saturation,
         #  self.camera.iso, self.exposure_compensation)
-        return f"Contrast: {self.camera.contrast} Brigthness: {self.camera.brightness} Saturation: {self.camera.saturation} Iso: {self.camera.iso} Exposure Compensation: {self.exposure_compensation}"
+        return f"Contrast: {self.camera.contrast} Brigthness: {self.camera.brightness} Saturation: {self.camera.saturation} Iso: {self.camera.iso} Exposure Compensation: {self.exposure_compensation}" # pylint: disable=line-too-long
 
     def set_str(self):
         "return short settings"
@@ -88,7 +90,12 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
 
 def init_camera():
     "camera standard initialisation"
-    camera = PiCamera(resolution='HD')
+    try:
+        camera = PiCamera(resolution='HD')
+    except:
+        print("Init camera gik galt")
+        sys.exit(1)
+        os._exit(2)
     camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
@@ -117,10 +124,18 @@ def fix_exposure(mycamera):
 
 def auto_exposure(mycamera):
     "set auto exposure on"
-    mycamera.iso = 0
-    mycamera.shutter_speed = 0
-    mycamera.exposure_mode = 'auto'
-    mycamera.awb_mode = 'auto'
+    FIX_EXPOSURE = True
+    if FIX_EXPOSURE:
+        mycamera.iso = 100
+        #mycamera.shutter_speed = 50000000
+        mycamera.exposure_mode = 'fixedfps'
+        mycamera.awb_mode = 'off'
+
+    else:
+        mycamera.iso = 0
+        mycamera.shutter_speed = 0
+        mycamera.exposure_mode = 'auto'
+        mycamera.awb_mode = 'auto'
 
 def get_picture_info(camera):
     "get the picture info from last picture"
@@ -172,7 +187,7 @@ def get_exposure_info(camera):
     exposure_speed = camera.exposure_speed
     analog_gain = float(camera.analog_gain)
     digital_gain = float(camera.digital_gain)
-    strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
+    strg = f"ExposureSpeed: {exposure_speed/1000000:5.5f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
     return strg
 
 
@@ -190,7 +205,6 @@ def get_white_balance(camera):
 
 def get_camera_settings(camera):
     "get camera settings as string"
-    #strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
     strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec\r\n"
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"
     strg += f"Brightness {camera.brightness:5.3f} Contrast {camera.contrast:5.3f}\r\n"
