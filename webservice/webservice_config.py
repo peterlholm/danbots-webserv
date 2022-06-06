@@ -1,11 +1,11 @@
-#
-# read config and generate global coonstants
+"Initialise webservie config"
+# read config and generate global constants
 #
 #import os
 from sys import platform
 import configparser
 
-MYDEBUG=False
+_DEBUG=False
 WINDOWS=False
 CONFIGFILE="/etc/danwand.conf"
 
@@ -13,15 +13,16 @@ if platform=="win32":
     print("windows")
     CONFIGFILE = '..\\danwand.conf'
 
-with open ("/etc/debian_version", "r") as myfile:
-    DEBIAN_VERSION=myfile.readlines()
+# with open ("/etc/debian_version", "r") as myfile:
+#     DEBIAN_VERSION=myfile.readlines()
 
-print ("Debian version: " + DEBIAN_VERSION[0])
+# print ("Debian version: " + DEBIAN_VERSION[0])
 
-if MYDEBUG:
+if _DEBUG:
     print ("Reading config file")
 
 def save_config(config):
+    "save the current config in file"
     with open(CONFIGFILE, 'w', encoding="UTF8") as configfile:
         config.write(configfile)
 
@@ -71,15 +72,16 @@ if not myconfig.has_section('capture_3d'):
     save_config(myconfig)
 
 CAPTURE_3D = dict(myconfig.items('capture_3d'))
+
 #ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
 
-if not myconfig.has_section('capture_2d'):
-    myconfig.add_section('capture_2d')
-    #myconfig['capture_2d']['exposure_compensation'] = "0"
-    myconfig['capture_2d']['flash'] = "0.2"
-    myconfig['capture_2d']['capture_delay'] = "0.5"
-    myconfig['capture_2d']['number_pictures'] = "10"
-    myconfig['capture_2d']['picture_interval'] = "1.0"
-    save_config(myconfig)
+# if not myconfig.has_section('capture_2d'):
+#     myconfig.add_section('capture_2d')
+#     #myconfig['capture_2d']['exposure_compensation'] = "0"
+#     myconfig['capture_2d']['flash'] = "0.2"
+#     myconfig['capture_2d']['capture_delay'] = "0.5"
+#     myconfig['capture_2d']['number_pictures'] = "10"
+#     myconfig['capture_2d']['picture_interval'] = "1.0"
+#     save_config(myconfig)
 
-CAPTURE_2D = dict(myconfig.items('capture_2d'))
+# CAPTURE_2D = dict(myconfig.items('capture_2d'))
