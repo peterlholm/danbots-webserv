@@ -8,8 +8,6 @@ help:
 	@echo "make requirements for python environment"
 	@echo "make website for website update"
 
-
-
 requirements:
 	pip install -r requirements.txt
 
@@ -35,10 +33,7 @@ pigpiod:
 danwand-user:
 	usermod -aG i2c danwand
 
-#a2ensite webservice
-#systemctl restart apache2
-
-# as system service
+# as a flas debug system service
 webservice-daemon:
 	cp apache/webservice.service /etc/systemd/system/
 	systemctl enable webservice.service
@@ -47,6 +42,6 @@ webservice-daemon:
 apache-site:	apache-sw apacheconf
 	@echo "Installing appache prod site"
 
-
+# install all nessesary sw
 
 install:	requirements webservice-daemon danwand-user pigpiod website

@@ -6,7 +6,7 @@ from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
 from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
-# python: disable=unresolved-import,import-error,line-too-long
+# pylint: disable=unresolved-import,import-error,line-too-long
 
 _DEBUG = False
 
@@ -86,7 +86,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
 
     def set_str(self):
         "return short settings"
-        return "Contrast: {self.contrast} Brigthness: {self.brightness} Saturation: {self.saturation}"
+        return "Contrast: {self.contrast} Brigthness: {self.brightness} Saturation: {self.saturation}" # pylintx: disable=line-too-long
 
 def init_camera():
     "camera standard initialisation"
@@ -96,6 +96,8 @@ def init_camera():
         print("Init camera gik galt")
         sys.exit(1)
         os._exit(2)
+        raise RuntimeError
+        
     camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
