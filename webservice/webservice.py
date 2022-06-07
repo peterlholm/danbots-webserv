@@ -6,7 +6,7 @@ from version import VERSION
 from picture import pic
 #from pic_2d import pic2d
 from pic_3d import pic3d
-from calibrate.calibrate import calibrate
+#from calibrate.calibrate import calibrate
 #from calibrate.camera_test import test
 from hw.led_control import set_dias, set_flash
 

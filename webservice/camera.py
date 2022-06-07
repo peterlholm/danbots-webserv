@@ -6,7 +6,7 @@ from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
 from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
-# pylint: disable=unresolved-import,import-error,line-too-long
+# pylint: disable=import-error,line-too-long
 
 _DEBUG = False
 
@@ -92,12 +92,12 @@ def init_camera():
     "camera standard initialisation"
     try:
         camera = PiCamera(resolution='HD')
-    except:
+    except Exception as exc:
         print("Init camera gik galt")
         sys.exit(1)
         os._exit(2)
-        raise RuntimeError
-        
+        raise RuntimeError from exc
+    
     camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
