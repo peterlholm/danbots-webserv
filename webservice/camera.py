@@ -1,6 +1,6 @@
 """ camera module for scanning """
-import sys
-import os
+#import sys
+#import os
 #from sys import platform
 from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
@@ -93,11 +93,12 @@ def init_camera():
     try:
         camera = PiCamera(resolution='HD')
     except Exception as exc:
-        print("Init camera gik galt")
-        sys.exit(1)
-        os._exit(2)
+        print("Init camera gik galt sys.exit 1", exc)
+        #sys.exit(1)
+        print("os.exit(2)")
+        #os._exit(2)
         raise RuntimeError from exc
-    
+
     camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
@@ -126,18 +127,10 @@ def fix_exposure(mycamera):
 
 def auto_exposure(mycamera):
     "set auto exposure on"
-    FIX_EXPOSURE = True
-    if FIX_EXPOSURE:
-        mycamera.iso = 100
-        #mycamera.shutter_speed = 50000000
-        mycamera.exposure_mode = 'fixedfps'
-        mycamera.awb_mode = 'off'
-
-    else:
-        mycamera.iso = 0
-        mycamera.shutter_speed = 0
-        mycamera.exposure_mode = 'auto'
-        mycamera.awb_mode = 'auto'
+    mycamera.iso = 0
+    mycamera.shutter_speed = 0
+    mycamera.exposure_mode = 'auto'
+    mycamera.awb_mode = 'auto'
 
 def get_picture_info(camera):
     "get the picture info from last picture"
@@ -191,7 +184,6 @@ def get_exposure_info(camera):
     digital_gain = float(camera.digital_gain)
     strg = f"ExposureSpeed: {exposure_speed/1000000:5.5f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
     return strg
-
 
 def get_exposure_info_dict(camera):
     """Get the exposure info as string"""

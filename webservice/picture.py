@@ -9,6 +9,7 @@ from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info, myzoom # pylint: disable=line-too-long
 from hw.led_control import set_dias, set_flash
+from pic_param import get_fix_param
 
 DEFAULT_JPG_QUALITY = 85
 
@@ -26,6 +27,15 @@ def get_set_led():
     #print (f"GetSetLed {stop - start:.3f} seconds")
     return "dias="+str(dias) +"&flash="+str(flash)
 
+# def get_fix_param(camera):
+#     "decode and set camera param from parameters"
+#     exp = float(request.args.get('exp',0))
+#     iso = float(request.args.get('iso',0))
+#     if exp != 0:
+#         camera.shutter_speed = int (exp*1000000)
+#     if iso != 0:
+#         camera.iso = int(iso)
+
 def led_off():
     "Turn both leds off"
     set_flash(0)
@@ -35,6 +45,8 @@ def get_picture(camera, format='jpeg', quality=DEFAULT_JPG_QUALITY): # pylint: d
     "Take picture and put in ByteIO stream"
     fd1 = BytesIO()
     camera.capture(fd1, format=format, quality=quality)
+    if _DEBUG:
+        print(get_exposure_info(camera))
     fd1.truncate()
     fd1.seek(0)
     camera.close()
@@ -95,8 +107,6 @@ def u_picture():
         camera.zoom = res
     get_set_led()
     warm_up()
-    if _DEBUG:
-        print(get_exposure_info(camera))
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
 @pic.route('/p_picture')
@@ -133,8 +143,9 @@ def cam():
         quality=int(quality)
     else:
         quality = DEFAULT_JPG_QUALITY
-    camera.iso = 100
-    
+    get_fix_param(request, camera)
+    #camera.iso = 100
+
     return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame') # pylint: disable=line-too-long
 
 @pic.route('/info')

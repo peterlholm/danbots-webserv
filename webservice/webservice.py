@@ -1,6 +1,7 @@
 "scanner webservice"
 import sys
 import signal
+import time
 from flask import Flask, render_template #, request, session, redirect
 from version import VERSION
 from picture import pic
@@ -38,9 +39,10 @@ print ("Starting Webservice")
 signal.signal(signal.SIGTERM, receive_signal)
 signal.signal(signal.SIGINT, receive_signal)
 
-print("Test LED")
+#print("Test LED")
 set_flash(1)
 set_dias(1)
+time.sleep(0.1)
 set_dias(0)
 set_flash(0)
 
