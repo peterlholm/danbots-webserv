@@ -75,13 +75,15 @@ CAPTURE_3D = dict(myconfig.items('capture_3d'))
 
 #ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
 
-# if not myconfig.has_section('capture_2d'):
-#     myconfig.add_section('capture_2d')
-#     #myconfig['capture_2d']['exposure_compensation'] = "0"
-#     myconfig['capture_2d']['flash'] = "0.2"
-#     myconfig['capture_2d']['capture_delay'] = "0.5"
-#     myconfig['capture_2d']['number_pictures'] = "10"
-#     myconfig['capture_2d']['picture_interval'] = "1.0"
-#     save_config(myconfig)
+# 2D
 
-# CAPTURE_2D = dict(myconfig.items('capture_2d'))
+if not myconfig.has_section('capture_2d'):
+    myconfig.add_section('capture_2d')
+    #myconfig['capture_2d']['exposure_compensation'] = "0"
+    myconfig['capture_2d']['flash'] = "0.2"
+    myconfig['capture_2d']['capture_delay'] = "0.5"
+    myconfig['capture_2d']['number_pictures'] = "10"
+    myconfig['capture_2d']['picture_interval'] = "1.0"
+    save_config(myconfig)
+
+CAPTURE_2D = dict(myconfig.items('capture_2d'))

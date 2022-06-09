@@ -30,7 +30,8 @@ def capture_picture(camera):
     fd1.seek(0)
     return fd1
 
-def get_pictures(camera):
+def get_pictures(camera, cmd=""):
+    "take pictures and send cam and pictures to server"
     number_pictures = NUMBER_PICTURES
     fd1 = BytesIO()
     i=1
@@ -75,6 +76,7 @@ pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 
 @pic2d.route('/2d')
 def cam():
+    "show cam and send pictures"
     set_flash(FLASH_LEVEL)
     send_api_request("start2d", url=COMPUTE_SERVER)
     camera = init_camera()
@@ -84,7 +86,8 @@ def cam():
     if size:
         camera.resolution =(int(size),int(size))
     warm_up()
-    return Response(get_pictures(camera),mimetype='multipart/x-mixed-replace; boundary=frame')
+    cmd = request.args.get('cmd', "")
+    return Response(get_pictures(camera, cmd=cmd),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @pic2d.route('/p_2d')
 def p_cam():

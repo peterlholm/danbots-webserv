@@ -9,23 +9,23 @@ from io import BytesIO
 from flask import Blueprint, send_file, Response, request, render_template
 from camera import init_camera, warm_up,  get_picture_info, get_exposure_info, myzoom # pylint: disable=line-too-long
 from hw.led_control import set_dias, set_flash
-from pic_param import get_fix_param
+from pic_param import get_fix_param, get_set_led
 
 DEFAULT_JPG_QUALITY = 85
 
 _DEBUG = True
 
-def get_set_led():
-    "Decode led information from url"
-    # 1.003 sec on slow connections
-    #start  = perf_counter()
-    dias = float(request.args.get('dias',0))
-    set_dias(dias)
-    flash = float(request.args.get('flash',0))
-    set_flash(flash)
-    #stop = perf_counter()
-    #print (f"GetSetLed {stop - start:.3f} seconds")
-    return "dias="+str(dias) +"&flash="+str(flash)
+# defget_set_led(request):
+#     "Decode led information from url"
+#     # 1.003 sec on slow connections
+#     #start  = perf_counter()
+#     dias = float(request.args.get('dias',0))
+#     set_dias(dias)
+#     flash = float(request.args.get('flash',0))
+#     set_flash(flash)
+#     #stop = perf_counter()
+#     #print (f"GetSetLed {stop - start:.3f} seconds")
+#     return "dias="+str(dias) +"&flash="+str(flash)
 
 # def get_fix_param(camera):
 #     "decode and set camera param from parameters"
@@ -105,14 +105,14 @@ def u_picture():
         res = myzoom(float(zoom))
         print ("zoom", zoom, res)
         camera.zoom = res
-    get_set_led()
+    get_set_led(request)
     warm_up()
     return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
 
 @pic.route('/p_picture')
 def p_picture():
     "Take picture and return html page with picture and information"
-    arg = "?" + get_set_led()
+    arg = "?" + get_set_led(request)
     camera = init_camera()
     warm_up()
     #exposure = get_exposure_info(camera)
@@ -120,16 +120,10 @@ def p_picture():
     camera.close()
     return render_template('picture.html', name="", exposure=exposure, arg=arg)
 
-@pic.route('/p_cam')
-def p_cam():
-    "Start cam and return html page with mpeg stream and information"
-    arg=get_set_led()
-    return render_template('cam.html', name="", arg=arg)
-
 @pic.route('/cam')
 def cam():
     "Start Cam and return mpeg stream"
-    get_set_led()
+    get_set_led(request)
     camera = init_camera()
     size = request.args.get('size', None)
     if size:
@@ -145,14 +139,19 @@ def cam():
         quality = DEFAULT_JPG_QUALITY
     get_fix_param(request, camera)
     #camera.iso = 100
-
     return Response(scan_cont_pictures(camera, quality=quality),mimetype='multipart/x-mixed-replace; boundary=frame') # pylint: disable=line-too-long
+
+@pic.route('/p_cam')
+def p_cam():
+    "Start cam and return html page with mpeg stream and information"
+    arg = get_set_led(request)
+    return render_template('cam.html', name="", arg=arg)
 
 @pic.route('/info')
 def info():
     "get picture info without taking picture"
     camera = init_camera()
-    get_set_led()
+    get_set_led(request)
     warm_up()
     camera_info = get_picture_info(camera)
     #pprint.pprint(camera_info)

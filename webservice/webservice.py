@@ -5,7 +5,7 @@ import time
 from flask import Flask, render_template #, request, session, redirect
 from version import VERSION
 from picture import pic
-#from pic_2d import pic2d
+from pic_2d import pic2d
 from pic_3d import pic3d
 #from calibrate.calibrate import calibrate
 #from calibrate.camera_test import test
@@ -27,7 +27,7 @@ print("Loading Webservice " + VERSION)
 app = Flask(__name__)
 app.debug = True
 app.register_blueprint(pic)
-#app.register_blueprint(pic2d)
+app.register_blueprint(pic2d)
 app.register_blueprint(pic3d)
 #app.register_blueprint(calibrate)
 #app.register_blueprint(calibrate_flash)
