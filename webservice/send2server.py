@@ -15,9 +15,11 @@ from webservice_config import  API_SERVER, COMPUTE_SERVER, DEVICEID
 SENDFILES = "sendfiles"
 
 HTTP_TIMEOUT=60
+
 _DEBUG=False
 
 def send_api_request(function, post_data=None, url=API_SERVER):
+    "send request to server function can include getparams"
     params = {"deviceid": DEVICEID}
     if post_data:
         params.update(post_data)
@@ -38,24 +40,27 @@ def send_api_request(function, post_data=None, url=API_SERVER):
     return True
 
 def send_api_request_bg (function, post_data=None, url=API_SERVER):
+    "send api request in background"
     th1 = threading.Thread(target=send_api_request, args=(function, post_data, url))
     th1.start()
 
-def post_file_object(api_request, fileobj, post_data=None, url=COMPUTE_SERVER):
+def post_single_file(api_request, fileobj, post_data=None, url=COMPUTE_SERVER, filename='picture.jpg'):
+    "post single file object - 2d"
     url_req = url + api_request
     file_spec = []
     params = {"deviceid": DEVICEID}
     if post_data:
         params.update(post_data)
-    file_spec = {'Picture': ("filnavn.png", fileobj)}
+    file_spec = {'Picture': (filename, fileobj)}
     try:
         req = requests.post(url_req, timeout=HTTP_TIMEOUT, files=file_spec, data=params)
     except requests.exceptions.RequestException as ex:
         print(ex)
         return False
     if req.status_code == requests.codes.ok:  #pylint: disable=no-member
-        print('det gik godt')
-        print(req.text)
+        if _DEBUG:
+            print('post single file OK')
+            print(req.text)
         return True
     print('Noget gik galt: ', req.status_code)
     print(req.text)

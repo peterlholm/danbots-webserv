@@ -42,8 +42,8 @@ COMPUTE_SERVER=myconfig['server']['computeserver']
 LEDHW=''
 if myconfig.has_section('hw'):
     LEDHW = myconfig['hw'].get('led','')
-
 #print("Led: ", LEDHW)
+
 # camera
 
 if not myconfig.has_section('camera'):
@@ -60,6 +60,8 @@ WARMUP_TIME = float(myconfig['camera'].get('warmup_time',1))
 HEIGHT = int(myconfig['camera'].get('height',160))
 WIDTH = int(myconfig['camera'].get('width',160))
 ZOOM = float(myconfig['camera'].get('zoom',1))
+
+# 3d
 
 if not myconfig.has_section('capture_3d'):
     myconfig.add_section('capture_3d')

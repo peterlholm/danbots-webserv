@@ -7,7 +7,8 @@ from camera import init_camera, warm_up, get_exposure_info #get_picture_info,
 from send_files import send_file_object #, send_api_request
 from webservice_config import API_SERVER, COMPUTE_SERVER, CAPTURE_2D
 from hw.led_control import set_flash
-from send2server import send_api_request,  post_file_object # send_api_request_bg,
+from send2server import send_api_request, post_single_file
+from pic_param import get_set_led
 
 # python: disable=unresolved-import,import-error
 
@@ -55,8 +56,8 @@ def get_pictures(camera, cmd=""):
             fd1.seek(0)
             if i % pic_modolu == 0:
                 #send_api_request_bg('save2d', url=COMPUTE_SERVER)
-                params = {'pictureno': pic_no}
-                post_file_object("save2d", fd1, post_data=params)
+                params = {'pictureno': pic_no, 'cmd': cmd}
+                post_single_file("save2d", fd1, post_data=params)
                 #send_picture(fd1, pic_no)
                 fd1.seek(0)
                 pic_no = pic_no+1
@@ -78,13 +79,14 @@ pic2d = Blueprint('2d', __name__, url_prefix='/2d')
 def cam():
     "show cam and send pictures"
     set_flash(FLASH_LEVEL)
-    send_api_request("start2d", url=COMPUTE_SERVER)
+    send_api_request("start2d?cmd=2d", url=COMPUTE_SERVER)
     camera = init_camera()
     camera.resolution =(640,480)
     #camera.framerate_range =(10,25)
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
+    get_set_led(request)
     warm_up()
     cmd = request.args.get('cmd', "")
     return Response(get_pictures(camera, cmd=cmd),mimetype='multipart/x-mixed-replace; boundary=frame')
