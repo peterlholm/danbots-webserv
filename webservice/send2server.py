@@ -66,6 +66,11 @@ def post_single_file(api_request, fileobj, post_data=None, url=COMPUTE_SERVER, f
     print(req.text)
     return False
 
+def post_single_file_bg(api_request, fileobj, post_data=None, url=COMPUTE_SERVER, filename='picture.jpg'):
+    "post in background"
+    th1 = threading.Thread(target=post_single_file, args=(api_request, fileobj, post_data, url, filename))
+    th1.start()
+
 def post_file_objects(api_request, name_object_list, post_data=None,url=COMPUTE_SERVER):
     """
     Send a list of file objects (filename, fd)
