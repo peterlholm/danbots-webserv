@@ -80,7 +80,8 @@ def cam():
     set_flash(FLASH_LEVEL)
     send_api_request("start2d?cmd=2d", url=COMPUTE_SERVER)
     camera = init_camera()
-    camera.resolution =(640,480)
+    camera.resolution =(2592,1944)
+    #camera.resolution =(640,480)
     size = request.args.get('size', None)
     if size:
         camera.resolution =(int(size),int(size))
