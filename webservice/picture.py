@@ -22,7 +22,7 @@ def led_off():
     set_flash(0)
     set_dias(0)
 
-def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin  
+def get_picture(camera, format='jpeg', quality=None): # pylint: disable=redefined-builtin
     fd1 = BytesIO()
     camera.capture(fd1, format=format, quality=quality)
     fd1.truncate()
@@ -132,3 +132,50 @@ def info():
     camera.close()
     led_off()
     return Response(pprint.pformat(camera_info).replace('\n', '<br />')+'<br><a href="/">Back</a>')
+
+
+
+@pic.route('/still')
+def still():
+    #?quality=85&dias=0&type=jpeg/png
+    camera = init_camera()
+    camera.resolution =(2592,1944)
+    pic_format='jpeg'
+    pic_mime='image/jpeg'
+    img_type = request.args.get('type', None)
+    if img_type=='png':
+        pic_format='png'
+        pic_mime='image/png'
+    pic_quality = 85
+    quality = request.args.get('quality', None)
+    if quality:
+        pic_quality=int(quality)
+    size = request.args.get('size', None)
+    if size:
+        camera.resolution = (int(size),int(size))
+    compensation = request.args.get('compensation', None)
+    if compensation:
+        camera.exposure_compensation = int(compensation)
+    zoom = request.args.get('zoom', None)
+    if zoom:
+        res = myzoom(float(zoom))
+        print ("zoom", zoom, res)
+        camera.zoom = res
+    get_set_led()
+
+    if _DEBUG:
+        print(get_exposure_info(camera))
+
+    fd1 = BytesIO()
+    camera.capture(fd1, format='jpeg', quality=quality)
+    fd1.truncate()
+    fd1.seek(0)
+    camera.close()
+    led_off()
+
+
+    camera_info = get_picture_info(camera)
+    print (camera_info)
+
+    return send_file(fd1, attachment_filename='python.jpg')
+    #return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
