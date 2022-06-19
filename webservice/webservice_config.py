@@ -1,11 +1,11 @@
-#
-# read config and generate global coonstants
+"Initialise webservie config"
+# read config and generate global constants
 #
 #import os
 from sys import platform
 import configparser
 
-MYDEBUG=False
+_DEBUG=False
 WINDOWS=False
 CONFIGFILE="/etc/danwand.conf"
 
@@ -13,15 +13,16 @@ if platform=="win32":
     print("windows")
     CONFIGFILE = '..\\danwand.conf'
 
-with open ("/etc/debian_version", "r") as myfile:
-    DEBIAN_VERSION=myfile.readlines()
+# with open ("/etc/debian_version", "r") as myfile:
+#     DEBIAN_VERSION=myfile.readlines()
 
-print ("Debian version: " + DEBIAN_VERSION[0])
+# print ("Debian version: " + DEBIAN_VERSION[0])
 
-if MYDEBUG:
+if _DEBUG:
     print ("Reading config file")
 
 def save_config(config):
+    "save the current config in file"
     with open(CONFIGFILE, 'w', encoding="UTF8") as configfile:
         config.write(configfile)
 
@@ -41,8 +42,8 @@ COMPUTE_SERVER=myconfig['server']['computeserver']
 LEDHW=''
 if myconfig.has_section('hw'):
     LEDHW = myconfig['hw'].get('led','')
-
 #print("Led: ", LEDHW)
+
 # camera
 
 if not myconfig.has_section('camera'):
@@ -60,6 +61,8 @@ HEIGHT = int(myconfig['camera'].get('height',160))
 WIDTH = int(myconfig['camera'].get('width',160))
 ZOOM = float(myconfig['camera'].get('zoom',1))
 
+# 3d
+
 if not myconfig.has_section('capture_3d'):
     myconfig.add_section('capture_3d')
     myconfig['capture_3d']['exposure_compensation'] = "0"
@@ -71,7 +74,10 @@ if not myconfig.has_section('capture_3d'):
     save_config(myconfig)
 
 CAPTURE_3D = dict(myconfig.items('capture_3d'))
+
 #ZOOM = myconfig['capture_3d'].getfloat('zoom',None)
+
+# 2D
 
 if not myconfig.has_section('capture_2d'):
     myconfig.add_section('capture_2d')

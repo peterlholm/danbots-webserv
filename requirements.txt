@@ -3,6 +3,7 @@ flask
 
 pylint
 
+# raspberry
 picamera
 gpiozero
 pigpio

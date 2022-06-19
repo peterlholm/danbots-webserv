@@ -1,10 +1,11 @@
+" initialisation of flask etc"
 import os
 from flask import Flask, request, Response, session, send_file, redirect
 
 #from test.test import *
 
 def create_app(test_config=None):
-    # create and configure the app
+    "create and configure the app"
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -28,9 +29,9 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    import picture
-    #print ("__init__")
-    app.register_blueprint(picture.pic)
+    # import picture
+    # #print ("__init__")
+    # app.register_blueprint(picture.pic)
 
     @app.route('/')
     def home():            # pylint: disable=unused-variable

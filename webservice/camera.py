@@ -1,22 +1,20 @@
 """ camera module for scanning """
-#from sys import platform
 from time import sleep
 from picamera import PiCamera   # pylint: disable=import-error
 from webservice_config import MINFRAMERATE, MAXFRAMERATE, WARMUP_TIME, HEIGHT, WIDTH, ZOOM
 
-# python: disable=unresolved-import,import-error
+# pylint: disable=import-error,line-too-long
 
 _DEBUG = False
 
 def myzoom(val):
-    #print ("myzoom", val)
+    "Convert from float to tuple for camera"
     dif =1-val
-    #print(d)
     res = (dif/2,dif/2,1-dif,1-dif)
-    #print(res)
     return res
 
 class CameraSettings:   # pylint: disable=too-many-instance-attributes
+    "Class for camera settings"
     camera = None
     contrast = 0
     brightness = 50
@@ -24,7 +22,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
     iso = None
     exposure_compensation = 0
     exposure_mode = 'auto'
-    awb_mode = 'auto'
+    awb_mode = 'flash'
     sharpness = 0
     meter_mode = 'average'
     drc_strength = 'off'
@@ -37,6 +35,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         #self.reset()
 
     def set(self):
+        "initialisation"
         self.camera.contrast = self.contrast
         self.camera.brightness = self.brightness
         self.camera.saturation = self.saturation
@@ -50,11 +49,11 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.camera.drc_strength = self.drc_strength
         self.camera.resolution = self.resolution
         self.camera.shutter_speed = self.shutter_speed
-        #print ("set", self.zoom)
         #myzoom(self.zoom)
         #self.camera.zoom = (1.0-self.zoom, 1.0-self.zoom, self.zoom, self.zoom)
 
     def reset(self):
+        "Reset settings"
         print ("resetting")
         self.camera.contrast = 0
         self.camera.brightness = 50
@@ -62,7 +61,7 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.iso = None
         self.exposure_compensation = 0
         self.exposure_mode = 'auto'
-        self.awb_mode = 'auto'
+        self.awb_mode = 'flash'
         self.sharpness = 0
         self.meter_mode = 'average'
         self.drc_strength = 'off'
@@ -71,15 +70,25 @@ class CameraSettings:   # pylint: disable=too-many-instance-attributes
         self.zoom = 1
 
     def str(self):
-        # return "Contrast: {} Brigthness: {} Saturation: {} Iso: {} Exposure Compensation: {} ".format(
-        #     self.camera.contrast, self.camera.brightness, self.camera.saturation,  self.camera.iso, self.exposure_compensation)
-        return f"Contrast: {self.camera.contrast} Brigthness: {self.camera.brightness} Saturation: {self.camera.saturation} Iso: {self.camera.iso} Exposure Compensation: {self.exposure_compensation}"
+        "return settings as string"
+        return f"Contrast: {self.camera.contrast} Brigthness: {self.camera.brightness} Saturation: {self.camera.saturation} Iso: {self.camera.iso} Exposure Compensation: {self.exposure_compensation}" # pylint: disable=line-too-long
 
-    def set_str(self):
-        return "Contrast: {self.contrast} Brigthness: {self.brightness} Saturation: {self.saturation}"
+    # def set_str(self):
+    #     "return short settings"
+    #     return "Contrast: {self.contrast} Brigthness: {self.brightness} Saturation: {self.saturation}" # pylintx: disable=line-too-long
 
 def init_camera():
-    camera = PiCamera(resolution='HD')
+    "camera standard initialisation"
+    try:
+        camera = PiCamera(resolution='HD')
+    except Exception as exc:
+        print("Init camera gik galt sys.exit 1", exc)
+        #sys.exit(1)
+        print("os.exit(2)")
+        #os._exit(2)
+        raise RuntimeError from exc
+
+    camera.awb_mode = 'flash'
     camera.framerate_range =(MINFRAMERATE, MAXFRAMERATE)
     camera.resolution = (WIDTH, HEIGHT)
     #camera.resolution =(2592,1944)(1280,720)(640,480)(160,160)
@@ -89,10 +98,11 @@ def init_camera():
     return camera
 
 def warm_up():
+    "give time for callibaration of exposure"
     sleep(WARMUP_TIME)
 
 def fix_exposure(mycamera):
-    # fix the current iso, shutter, gain but NOT awb setting
+    "fix the current iso, shutter, gain but NOT awb setting"
     #mycamera.iso = 800
     if _DEBUG:
         print ("Fixing exposure at", get_exposure_info(mycamera))
@@ -105,12 +115,14 @@ def fix_exposure(mycamera):
         print ("Fixed exposure at", get_exposure_info(mycamera))
 
 def auto_exposure(mycamera):
+    "set auto exposure on"
     mycamera.iso = 0
     mycamera.shutter_speed = 0
     mycamera.exposure_mode = 'auto'
     mycamera.awb_mode = 'auto'
 
 def get_picture_info(camera):
+    "get the picture info from last picture"
     info = { 'analog_gain': camera.analog_gain,
      'digital_gain': camera.digital_gain,
      'awb_gains': camera.awb_gains,
@@ -144,6 +156,7 @@ def get_picture_info(camera):
     return info
 
 def get_picture_info_json(camera):
+    "get picture info in json format"
     info = get_picture_info(camera)
     info['analog_gain'] =float(info['analog_gain'])
     info['digital_gain'] =float(info['digital_gain'])
@@ -158,7 +171,7 @@ def get_exposure_info(camera):
     exposure_speed = camera.exposure_speed
     analog_gain = float(camera.analog_gain)
     digital_gain = float(camera.digital_gain)
-    strg = f"ExposureSpeed: {exposure_speed/1000000:5.3f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
+    strg = f"ExposureSpeed: {exposure_speed/1000000:5.5f} sec Gain: Analog: {analog_gain} Digital: {digital_gain} = {float(analog_gain * digital_gain):5.3f}"
     return strg
 
 def get_exposure_info_dict(camera):
@@ -170,10 +183,11 @@ def get_exposure_info_dict(camera):
     return exp
 
 def get_white_balance(camera):
+    "get white balance as string"
     return f"WhiteBalance: R: {float(camera.awb_gains[0]):5.3f} B: {float(camera.awb_gains[1]):5.3f}"
 
 def get_camera_settings(camera):
-    #strg = "ExposureSpeed: {:5.3f} sec(max {:5.1f}  pic/sec)\r\n".format(camera.exposure_speed/1000000, 1000000/camera.exposure_speed)
+    "get camera settings as string"
     strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec\r\n"
     strg += "Gain: analog " + str(camera.analog_gain) + " digital " + str(camera.digital_gain) + "\r\n"
     strg += f"Brightness {camera.brightness:5.3f} Contrast {camera.contrast:5.3f}\r\n"
@@ -184,24 +198,26 @@ def get_camera_settings(camera):
     strg += "PictureSize: " + str(camera.resolution) + "\r\n"
     return strg
 
-def print_settings(camera):
-    strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec(max {1000000/camera.exposure_speed:5.1f}  pic/sec)<br>"
-    strg += "FrameRate: " + str(camera.framerate) + "<br>"
-    strg += "FrameRateRange: " + str(camera.framerate_range) + "<br>"
-    strg += "PictureSize: " + str(camera.resolution) + "<br>"
-    return strg
+# def print_settings(camera):
+#     "get picture settings as string"
+#     strg = f"ExposureSpeed: {camera.exposure_speed/1000000:5.3f} sec(max {1000000/camera.exposure_speed:5.1f}  pic/sec)<br>"
+#     strg += "FrameRate: " + str(camera.framerate) + "<br>"
+#     strg += "FrameRateRange: " + str(camera.framerate_range) + "<br>"
+#     strg += "PictureSize: " + str(camera.resolution) + "<br>"
+#     return strg
 
-def calibrate_picture(camera):
-    sleep(WARMUP_TIME)
-    a_gain = camera.analog_gain
-    d_gain = camera.digital_gain
-    gain = float(a_gain) * float(d_gain)
-    iso = round(gain) * 100
-    cal = {
-        "exposure_speed": camera.exposure_speed,
-        "analog_gain": a_gain,
-        "digital_gain": d_gain,
-        "gain": float(a_gain) * float(camera.digital_gain),
-        "iso": int(iso)
-    }
-    return cal
+# def calibrate_picture(camera):
+#     "get callibration info - ??"
+#     sleep(WARMUP_TIME)
+#     a_gain = camera.analog_gain
+#     d_gain = camera.digital_gain
+#     gain = float(a_gain) * float(d_gain)
+#     iso = round(gain) * 100
+#     cal = {
+#         "exposure_speed": camera.exposure_speed,
+#         "analog_gain": a_gain,
+#         "digital_gain": d_gain,
+#         "gain": float(a_gain) * float(camera.digital_gain),
+#         "iso": int(iso)
+#     }
+#     return cal

@@ -1,14 +1,12 @@
 [MASTER]
-//load-plugins=pylint_django
 
-//django-settings-module=live.settings
 
 [MESSAGES CONTROL]
 
-disable=missing-function-docstring,
-        //missing-module-docstring,
-        missing-class-docstring,
-        line-too-long
+disable=line-too-long
+        #missing-function-docstring,
+        #missing-module-docstring,
+        #missing-class-docstring,
 
 [BASIC]
 
