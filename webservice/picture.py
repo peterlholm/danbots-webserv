@@ -163,6 +163,7 @@ def info():
 
 @pic.route('/still')
 def still():
+    "Take a still picture and send result"
     #?quality=85&dias=0&type=jpeg/png
     camera = init_camera()
     camera.resolution =(2592,1944)
@@ -187,16 +188,16 @@ def still():
         res = myzoom(float(zoom))
         print ("zoom", zoom, res)
         camera.zoom = res
-    get_set_led()
+    get_set_led(request)
 
     if _DEBUG:
         print(get_exposure_info(camera))
 
     fd1 = BytesIO()
-    camera.capture(fd1, format='jpeg', quality=quality)
+    camera.capture(fd1, format='jpeg', quality=pic_quality)
     fd1.truncate()
     fd1.seek(0)
-    camera.close()
+    #camera.close()
     led_off()
 
 
