@@ -192,7 +192,8 @@ def still():
 
     if _DEBUG:
         print(get_exposure_info(camera))
-
+    camera.start_preview()
+    warm_up()
     fd1 = BytesIO()
     camera.capture(fd1, format='jpeg', quality=pic_quality)
     fd1.truncate()
@@ -201,8 +202,8 @@ def still():
     led_off()
 
 
-    camera_info = get_picture_info(camera)
-    print (camera_info)
-
+    #camera_info = get_picture_info(camera)
+    #print (camera_info)
+    camera.close()
     return send_file(fd1, attachment_filename='python.jpg')
     #return send_file(get_picture(camera, format=pic_format, quality=pic_quality), mimetype=pic_mime)
